@@ -1,0 +1,28 @@
+# This file contains pkgconfig build requirements that get picked up
+# but are undesirable. One entry per line, no whitespace.
+enca
+gupnp-dlna-2.0
+gupnp-dlna-gst-2.0
+libavcodec
+flac
+gstreamer-1.0
+gstreamer-pbutils-1.0
+gstreamer-tag-1.0
+icu-i18n
+icu-uc
+libavformat
+libavutil
+libcue
+libexif
+libgsf-1
+libgxps
+libiptcdata
+libmediaart-2.0
+libnm-glib
+libosinfo-1.0
+meegotouch
+poppler-glib
+taglib_c
+totem-plparser
+upower-glib
+vorbisfile

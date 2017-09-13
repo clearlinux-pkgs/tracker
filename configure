@@ -1,0 +1,1 @@
+--enable-minimal --enable-tracker-fts=no --enable-icu-charset-detection=no

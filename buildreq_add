@@ -1,0 +1,9 @@
+# This file contains additional build requirements that did not get
+# picked up automatically. One name per line, no whitespace.
+libsoup-dev
+json-glib-dev
+libunistring-dev
+gobject-introspection-dev
+libexif-dev
+gstreamer-dev
+libjpeg-turbo-dev
