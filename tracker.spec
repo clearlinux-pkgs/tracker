@@ -4,7 +4,7 @@
 #
 Name     : tracker
 Version  : 1.12.3
-Release  : 1
+Release  : 2
 URL      : https://download.gnome.org/sources/tracker/1.12/tracker-1.12.3.tar.xz
 Source0  : https://download.gnome.org/sources/tracker/1.12/tracker-1.12.3.tar.xz
 Summary  : Tracker : A library to perform SPARQL queries and updates in the \
@@ -40,6 +40,7 @@ BuildRequires : pkgconfig(libxml-2.0)
 BuildRequires : pkgconfig(sqlite3)
 BuildRequires : pkgconfig(uuid)
 BuildRequires : pkgconfig(zlib)
+Patch1: 0001-don-t-autostart-by-default.patch
 
 %description
 1 Introduction
@@ -93,11 +94,18 @@ Group: Documentation
 doc components for the tracker package.
 
 
+%package extras
+Summary: extras components for the tracker package.
+Group: Default
+
+%description extras
+extras components for the tracker package.
+
+
 %package lib
 Summary: lib components for the tracker package.
 Group: Libraries
 Requires: tracker-data
-Requires: tracker-config
 
 %description lib
 lib components for the tracker package.
@@ -113,13 +121,14 @@ locales components for the tracker package.
 
 %prep
 %setup -q -n tracker-1.12.3
+%patch1 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1505330445
+export SOURCE_DATE_EPOCH=1507653994
 %configure --disable-static --enable-minimal --enable-tracker-fts=no --enable-icu-charset-detection=no
 make V=1  %{?_smp_mflags}
 
@@ -131,10 +140,13 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 make VERBOSE=1 V=1 %{?_smp_mflags} check || :
 
 %install
-export SOURCE_DATE_EPOCH=1505330445
+export SOURCE_DATE_EPOCH=1507653994
 rm -rf %{buildroot}
 %make_install
 %find_lang tracker
+## make_install_append content
+mv %{buildroot}%{_sysconfdir}/xdg %{buildroot}%{_datadir}/.
+## make_install_append end
 
 %files
 %defattr(-,root,root,-)
@@ -150,6 +162,7 @@ rm -rf %{buildroot}
 
 %files data
 %defattr(-,root,root,-)
+%exclude /usr/share/xdg/autostart/tracker-store.desktop
 /usr/lib64/girepository-1.0/Tracker-1.0.typelib
 /usr/lib64/girepository-1.0/TrackerControl-1.0.typelib
 /usr/lib64/girepository-1.0/TrackerMiner-1.0.typelib
@@ -331,6 +344,10 @@ rm -rf %{buildroot}
 /usr/share/gtk-doc/html/libtracker-sparql/tracker-overview.html
 /usr/share/gtk-doc/html/libtracker-sparql/up-insensitive.png
 /usr/share/gtk-doc/html/libtracker-sparql/up.png
+
+%files extras
+%defattr(-,root,root,-)
+/usr/share/xdg/autostart/tracker-store.desktop
 
 %files lib
 %defattr(-,root,root,-)
