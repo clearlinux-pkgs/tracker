@@ -1,0 +1,25 @@
+From f15b8658ea3fa2f91ac35f0e54598ee2e8084fda Mon Sep 17 00:00:00 2001
+From: "Simental Magana, Marcos" <marcos.simental.magana@intel.com>
+Date: Tue, 10 Oct 2017 11:09:17 -0500
+Subject: [PATCH] don't autostart by default
+
+---
+ src/tracker-store/tracker-store.desktop.in.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/tracker-store/tracker-store.desktop.in.in b/src/tracker-store/tracker-store.desktop.in.in
+index 78e855d..ee797ad 100644
+--- a/src/tracker-store/tracker-store.desktop.in.in
++++ b/src/tracker-store/tracker-store.desktop.in.in
+@@ -6,7 +6,7 @@ Exec=gdbus call -e -d org.freedesktop.DBus -o /org/freedesktop/DBus -m org.freed
+ Terminal=false
+ Type=Application
+ Categories=Utility;
+-X-GNOME-Autostart-enabled=true
++X-GNOME-Autostart-enabled=false
+ X-KDE-autostart-after=panel
+ X-KDE-StartupNotify=false
+ X-KDE-UniqueApplet=true
+-- 
+2.14.2
+
