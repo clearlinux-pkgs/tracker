@@ -1,1 +1,3 @@
+/usr/lib/systemd/user/tracker-store.service
+/usr/share/dbus-1/services/org.freedesktop.Tracker1.service
 /usr/share/xdg/autostart/tracker-store.desktop
