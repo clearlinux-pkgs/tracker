@@ -4,7 +4,7 @@
 #
 Name     : tracker
 Version  : 1.12.3
-Release  : 2
+Release  : 3
 URL      : https://download.gnome.org/sources/tracker/1.12/tracker-1.12.3.tar.xz
 Source0  : https://download.gnome.org/sources/tracker/1.12/tracker-1.12.3.tar.xz
 Summary  : Tracker : A library to perform SPARQL queries and updates in the \
@@ -128,7 +128,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1507653994
+export SOURCE_DATE_EPOCH=1507745373
 %configure --disable-static --enable-minimal --enable-tracker-fts=no --enable-icu-charset-detection=no
 make V=1  %{?_smp_mflags}
 
@@ -140,7 +140,7 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 make VERBOSE=1 V=1 %{?_smp_mflags} check || :
 
 %install
-export SOURCE_DATE_EPOCH=1507653994
+export SOURCE_DATE_EPOCH=1507745373
 rm -rf %{buildroot}
 %make_install
 %find_lang tracker
@@ -158,16 +158,16 @@ mv %{buildroot}%{_sysconfdir}/xdg %{buildroot}%{_datadir}/.
 
 %files config
 %defattr(-,root,root,-)
-/usr/lib/systemd/user/tracker-store.service
+%exclude /usr/lib/systemd/user/tracker-store.service
 
 %files data
 %defattr(-,root,root,-)
+%exclude /usr/share/dbus-1/services/org.freedesktop.Tracker1.service
 %exclude /usr/share/xdg/autostart/tracker-store.desktop
 /usr/lib64/girepository-1.0/Tracker-1.0.typelib
 /usr/lib64/girepository-1.0/TrackerControl-1.0.typelib
 /usr/lib64/girepository-1.0/TrackerMiner-1.0.typelib
 /usr/share/bash-completion/completions/tracker
-/usr/share/dbus-1/services/org.freedesktop.Tracker1.service
 /usr/share/gir-1.0/*.gir
 /usr/share/glib-2.0/schemas/org.freedesktop.Tracker.DB.gschema.xml
 /usr/share/glib-2.0/schemas/org.freedesktop.Tracker.Store.gschema.xml
@@ -347,6 +347,8 @@ mv %{buildroot}%{_sysconfdir}/xdg %{buildroot}%{_datadir}/.
 
 %files extras
 %defattr(-,root,root,-)
+/usr/lib/systemd/user/tracker-store.service
+/usr/share/dbus-1/services/org.freedesktop.Tracker1.service
 /usr/share/xdg/autostart/tracker-store.desktop
 
 %files lib
