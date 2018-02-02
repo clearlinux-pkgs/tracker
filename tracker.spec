@@ -4,7 +4,7 @@
 #
 Name     : tracker
 Version  : 1.12.3
-Release  : 3
+Release  : 4
 URL      : https://download.gnome.org/sources/tracker/1.12/tracker-1.12.3.tar.xz
 Source0  : https://download.gnome.org/sources/tracker/1.12/tracker-1.12.3.tar.xz
 Summary  : Tracker : A library to perform SPARQL queries and updates in the \
