@@ -1,30 +1,197 @@
-NEW in 1.12.3 - 2017-08-22
+NEW in 2.0.3 - 2018-02-07
+=========================
+
+  * build: Improvements in meson support.
+  * build: Remove stale dependencies after Tracker miners split
+  * tests: Many fixes to functional tests
+  * tests: Remove old checks for maemo-specific features
+  * libtracker-miner: Small code improvements.
+  * libtracker-sparql: use gint32 to unpack 'i' GVariant format
+
+Translations: is, nb
+
+NEW in 2.0.2 - 2017-11-14
+=========================
+
+  * tests: Cleanups and Coverity fixes. A testsuite for libtracker-miner's
+    TrackerMinerFS object was added.
+  * meson: Many small improvements.
+  * libtracker-common: Preparation work to be able to build
+    tracker/tracker-miners as a bundle.
+  * libtracker-direct: Implement update_array_async()
+  * libtracker-miner: Multiple cleanups and code simplifications.
+  * libtracker-miner: Properly honor lack of CHECK_MTIME flag, resulting
+    on faster startup times if it's not set.
+
+Translations: ca@valencia
+
+NEW in 2.0.1 - 2017-10-04
+=========================
+
+  * libtracker-fts: Fix FTS queries that included stop words
+  * libtracker-sparql: Fix introspection annotations for TrackerNotifier
+  * libtracker-miner: Fix cancellation of TrackerDecorator
+  * libtracker-miner: Several fixes to causes of nie:url UNIQUE constraint
+    errors, and better resilience against prior stale data.
+  * Meson fixes
+  * Compiler warning fixes
+
+Translations: sl, tr
+
+NEW in 2.0.0 - 2017-09-12
+=========================
+
+  * Tracker shall from now on use semantic versioning
+  * Drop --all from "tracker status" subcommand, it is the default
+    behavior now.
+  * TrackerDecorator internal operations are now cancelled on shutdown
+  * Add cancellable argument to sync libtracker-control call
+  * Build fixes and minor cleanups
+
+  Translations: ca, da, eu, fi, fur, it, ko, lt, lv, nl, pt_BR, sk, sv, zh_TW
+
+  Overview of changes since 1.12:
+
+  * Tracker core (store, libraries) and miners have been split, this source
+    tree contains the former.
+  * Added support for domain ontologies, these can be used to set up private
+    databases managed and populated by a standalone set of daemons. It was
+    devised for sandboxing environments like Flatpak, but can be used
+    independently.
+  * Added API to manage application-private databases with (optional) custom
+    ontologies. The application is in charge of content population as well as
+    queries.
+    No daemons are required for this usecase, so this becomes a SPARQL
+    endpoint equivalent to SQLite.
+  * libtracker-miner objects can now be used on the application side in
+    combination with application-private endpoints. An additional object
+    has been added to make TrackerMiner implementations exported through
+    DBus.
+  * The filesystem TrackerMiner base implementation has received some
+    notable speedups.
+  * Running multiple concurrent SELECT queries is now lock-free on most
+    situations.
+  * Meson build instructions have been added.
+
+NEW in 1.99.3 - 2017-08-22
 ==========================
+
+  WARNING: This is unstable development towards 2.0. There are API and
+           ABI incompatibilities that might affect you.
 
   * Mandate that SQLite >= 3.20.0 must have --enable-fts5. SQLite devs
     made forwards and backwards incompatible changes to the FTS5 module,
     it is not sustainable anymore to ship a FTS5 module for all
     combinations. The current FTS5 module in Tracker is preserved for
     older SQLite versions.
-  * Fix typo in userguides miner DBus name, fixes spam on journald trying
-    to start it up.
+  * Fixed a Coverity warning (CID #1453480)
+  * Misc code and build fixes.
 
-NEW in 1.12.2 - 2017-08-07
+Translations: fr, gl, ml, ne, pl, sr, sr@latin
+
+NEW in 1.99.2 - 2017-08-07
 ==========================
 
+  WARNING: This is unstable development towards 2.0. There are API and
+           ABI incompatibilities that might affect you.
+
+  * Miners have been split from the Tracker package, they can be found
+    at https://git.gnome.org/browse/tracker-miners.
   * Sqlite 3.20 introduced incompatible changes in the way FTS5 can be
     extended, compile/runtime checks were added to adapt to the new
     safer way if Sqlite >= 3.20.0 is found.
-  * Fix TrackerDBInterface being reused with no FTS set up.
+  * Elements are no longer leaked in the base Resource table. A refcounted
+    approach ensures no longer needed elements are cleaned up from that
+    table. The database will no longer indefinitely grow, it will be
+    cleaned up and vacuumed periodically.
+  * Fixed several Coverity warnings (CIDS: 1452447, 1188417, 1188418,
+    1188428, 1452443, 1452445, 1452449)
+  * Misc code and build fixes.
+  * Documentation improvements
 
-NEW in 1.12.1 - 2017-06-28
+Translations: de, hu
+
+NEW in 1.99.1 - 2017-07-19
 ==========================
 
-  * libtracker-sparql: Add osinfo to the default namespace
-  * libtracker-sparql: Protect sqlite3_bind* with interface lock
-  * tracker-extract: Whitelist openat(), with caveats
+  WARNING: This is unstable development towards 2.0. There are API and
+           ABI incompatibilities that might affect you.
 
-Translations: fur, ru, sr
+  * Notable speedups to tracker-miner-fs, main loop overhead was greatly
+    reduced by processing elements in batches. Indexing has been observed
+    to be up to 2x faster, and startup on an indexed and up-to-date
+    filesystem up to 3x.
+  * More notable speedups to tracker-miner-fs startup, this applies only
+    to filesystems where the number of indexed folders exceed the amount
+    of inotify handles. Inotify monitoring is temporarily disabled during
+    filesystem mtime checks, resulting in up to 4x faster startup. (In
+    addition to the previous point).
+  * Refurbished the allocation scheme for underlying DB interfaces. The
+    benefit is twofold, this makes TrackerSparqlConnections truly isolated
+    instances, and results in much reduced mutex contention on stress
+    situations.
+  * Dropped deprecated API to get direct/bus connections. Use
+    tracker_sparql_connection_get().
+  * Deprecated TrackerSparqlBuilder. Use TrackerResource.
+  * Added tracker_sparql_connection_get_namespace_manager() to fetch the
+    namespaces as per the ontology of the connection.
+  * Dropped support for non-standard SPARQL syntax "AS var", the right
+    syntax is "AS ?var", defined in SPARQL1.1 and accepted by Tracker
+    for a long time.
+  * Added tracker:title-order() sparql function, only meant to be used
+    in "ORDER BY" clauses. It drops the common articles at the beginning
+    of the given variable for sorting purposes.
+  * Fix shutdown issues on tracker-store introduced in 1.99.0. No more
+    spurious integrity checks on startup.
+  * Misc code and build fixes.
+
+Translations: fur, id, sk
+
+NEW in 1.99.0 - 2017-07-06
+==========================
+
+  WARNING: This is unstable development towards 2.0. There are API and
+           ABI incompatibilities that might affect you.
+
+  * Domain ontologies: it is now possible to create domain-specific SPARQL
+    endpoints with customizable ontologies and data locations. It is possible
+    to do so either in-process using the traditional Tracker daemons to
+    do the work (Note: miners rely on Nepomuk ontology).
+  * Deleted nautilus/firefox/evolution/thunderbird plugins. They were in
+    a pitiful state of maintainership, the latter 2 being known broken for
+    some time already.
+  * Deleted tracker-needle. It has been in strict maintenance state for years,
+    since then other UIs have integrated Tracker search and offer a more
+    compelling and modern experience.
+  * Deleted tracker-preferences. Tracker has been using GSettings for years,
+    so doesn't specifically require an UI for it, there's of course room
+    for desktop integrated configuration, gnome-control-center does this
+    for example.
+  * Made portions of libtracker-miner useful on the client side. Miners don't
+    mandate anymore an org.freedesktop.Tracker1.Miner DBus interface/name,
+    this is instead delegated on TrackerMinerProxy. TrackerMinerFS has been
+    made largely independent of the ontology in use, all high level operations
+    that do require SPARQL updates are now exposed in TrackerMinerFSClass.
+  * Removed deprecated and duplicate API on libtracker-miner
+  * Added documentation about creating and maintaining ontologies.
+  * Removed maemo leftovers.
+  * libtracker-sparql: Protect sqlite3_bind* with interface lock
+  * Improvements to meson build
+
+Translations: ca, sr
+
+NEW in 1.13.0 - 2017-05-23
+==========================
+
+  * Added support for the Meson build system, autotools will be eventually
+    discontinued.
+  * Compile fixes
+  * Fixed introspection annotations
+  * libtracker-sparql: Support osinfo ontology in TrackerNamespace
+  * Fix possible source of stale files in TrackerFileSystem
+  * Whitelist some more syscalls
+
+Translations: fur, ru
 
 NEW in 1.12.0 - 2017-03-20
 ==========================

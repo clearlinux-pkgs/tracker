@@ -1,6 +1,785 @@
+2018-02-07  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 2.0.3
+
+2018-01-31  Debarshi Ray  <debarshir@gnome.org>
+
+	libtracker-miner: Don't mix sync & async GFileEnumerator APIs
+	This enables enumeration of non-native files because GVfs doesn't like
+	to mix asynchronous & synchronous GFileEnumerators. If an enumerator
+	is obtained through one API variant, then it should be used via the
+	same API variant.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=792337
+
+	libtracker-miner: Rename a variable for consistency
+	https://bugzilla.gnome.org/show_bug.cgi?id=792337
+
+2018-01-24  Ting-Wei Lan  <lantw@src.gnome.org>
+
+	configure: Don't put includes in function body of AC_LANG_PROGRAM
+	The second argument of AC_LANG_PROGRAM is the content of main function.
+	We cannot put any includes there, or we end up testing whether the
+	compiler supports nested functions because headers may have definitions
+	for inline functions.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=792713
+
+	vala: Bump gir_version to 2.0
+	https://bugzilla.gnome.org/show_bug.cgi?id=792691
+
+2018-01-23  Debarshi Ray  <debarshir@gnome.org>
+
+	libtracker-sparql: Be more careful about integer sizes
+	The GVariant type string "i" refers to a signed 32-bit integer.
+	Therefore, gint32 is a much safer bet than gint, whose size is not
+	guaranteed across all platforms.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=792301
+
+2018-01-16  Debarshi Ray  <debarshir@gnome.org>
+
+	tracker-monitor: Tighten the scope of variables
+	https://bugzilla.gnome.org/show_bug.cgi?id=791067
+
+2017-12-28  Sam Thursfield  <sam@afuera.me.uk>
+
+	tests/libtracker-data: Fix error tests in tracker-sparql-test
+	The logic for testing if the correct error message was returned was the
+	wrong way round -- the comparer() function should return 0 if the
+	message we got was OK, and 1 otherwise.
+
+	Also we were calling strstr() backwards, we should look for the
+	expected result inside the actual result and not the other way around.
+
+	To complicate things, Tracker doesn't return error messages with
+	newlines but on disk the expected output usually contains newlines
+	as editors tend to add them. This makes the tests confusingly fail
+	when they look correct, so we now chomp newlines off the end of the
+	results file for expected error tests.
+
+	With this fixed, the expected output needed some corrections.
+
+2017-12-26  Sam Thursfield  <sam@afuera.me.uk>
+
+	Fix .gitignore and add missing ttl/meson.build file
+
+2017-12-18  Sam Thursfield  <sam.thursfield@codethink.co.uk>
+
+	functional-tests: Fix configuration to work with Meson
+	Previously the functional-test suite would test the installed version of
+	Tracker, but would need to be run from a configured Tracker source+build tree.
+
+	I have changed how things are configured and now with Meson the functional tests
+	can be run completely from the build tree, without needing to install
+	anything. The Autotools `make functional-test` target works the same as
+	before.
+
+	Instead of generating a Python source file that contains the build-time
+	configuration, we write that to a .json file which is read when the
+	common.utils.configuration module is imported. This controls the
+	locations of the various things that the tests require, which allows us
+	to avoid hardcoding knowledge of the build tree layout into the tests
+	themselves.
+
+	With the new setup it should also be possible to add a target that
+	explicitly installs the functional tests, with a different
+	configuration.json file so that they test the installed version of
+	Tracker. That's not yet implemented.
+
+	utils: Allow specifying output path for Barnum-based data generator
+	This makes it usable from Meson, as previously the only way to control
+	where the output went would be to change the working directory but
+	Meson's custom_target() rule doesn't make that possible.
+
+2017-12-18  Sam Thursfield  <sam@afuera.me.uk>
+
+	generate: Raise error when called improperly
+
+2017-12-18  Sam Thursfield  <sam.thursfield@codethink.co.uk>
+
+	functional-tests: Fix use of non existant predicate in 13-threaded-store
+
+	functional-tests: Remove tests that belong in tracker-miners
+
+2017-12-18  Sam Thursfield  <sam@afuera.me.uk>
+
+	Update Makefile.am for removed functional test files
+
+	functional-tests: Remove unused helper code
+
+	functional-tests: Remove tests that belong in tracker-miners.git
+
+	functional-tests: Remove some apparently unused scripts
+	Please add these back with a comment explaining where they are used
+	if they are indeed still needed.
+
+	Make HAVE_LIBICU checks consistently with #ifdef
+	We were in some places checking the value of HAVE_LIBICU as a boolean
+	and in others checking whether it was defined. This is broken because
+	when it is defined to 0 we mix up the code paths completely.
+
+	Fixes the Meson build since d5e9ce54196d5c9086423e688c8014c1225b858b.
+
+2017-12-16  Quentin Glidic  <sardemff7+git@sardemff7.net>
+
+	meson: Avoid NetworkManager automagic dependency
+	https://bugzilla.gnome.org/show_bug.cgi?id=791433
+
+	meson: Allow to build with non-GNU libc
+	https://bugzilla.gnome.org/show_bug.cgi?id=791432
+
+2017-12-16  Sam Thursfield  <sam@afuera.me.uk>
+
+	meson: Fix build with libstemmer
+	Based on a patch by Jeremy Bicha <jbicha@ubuntu.com>.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=790373
+
+	Revert "meson: Don't require gobject-introspection"
+	I should have tested this before merging! We do use this dependency.
+
+	This reverts commit 4d963a2b95b7786324fb0932f7f73f0a926ea84b.
+
+2017-12-16  Jeremy Bicha  <jbicha@debian.org>
+
+	meson: Don't require gobject-introspection
+	This is already checked for by the gnome.generate_gir() call.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=790385
+
+2017-12-16  Sam Thursfield  <sam@afuera.me.uk>
+
+	meson: Fix libunistring detection and codepath
+
+	Revert "libtracker-common: Add tracker-seccomp from the libtracker-miners library"
+	This reverts commit 9afd9afc67a2ccbe4d8eee59a4b9be796e794f2d.
+
+	This is no longer needed, instead we have renamed libtracker-common to
+	libtracker-miners-common in tracker-miners.git so that the two libraries
+	don't conflict when tracker.git is built as a subproject of
+	tracker-miners.git.
+
+2017-12-01  Debarshi Ray  <debarshir@gnome.org>
+
+	functional-tests: Unbreak test by fixing the name of the interface
+	The 410-extractor-decorator.py test fails with:
+	  Error: g-dbus-error-quark:
+	    GDBus.Error:org.freedesktop.DBus.Error.UnknownMethod: No such
+	    interface 'org.freedesktop.Tracker1.Miner.Index' on object at path
+	    /org/freedesktop/Tracker1/Miner/Files/Index (19)
+
+	Fallout from b4802ca33446772fb029df6215182e2091bdbf2c
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=790972
+
+2017-12-01  Sveinn í Felli  <sv1@fellsnet.is>
+
+	Add Icelandic translation
+
+2017-11-29  Debarshi Ray  <debarshir@gnome.org>
+
+	functional-tests: Unbreak test by removing haveMaemo conditionals
+	The 01-insertion.py test fails with:
+	  File "./01-insertion.py", line 774, in <module>
+	      class TrackerStorePhoneNumberTest (CommonTrackerStoreTest):
+	  File "./01-insertion.py", line 780, in TrackerStorePhoneNumberTest
+	      @ut.skipIf (not cfg.haveMaemo, "This test uses maemo:specific
+	        properties")
+	  AttributeError: 'module' object has no attribute 'haveMaemo'
+
+	The Maemo/Meego flags were removed and the 91-maemo ontology is now
+	installed unconditionally. Therefore there is no need to make this
+	test conditional.
+
+	Fallout from 809b56767fccd5680136485c6fbbc895e83dd886
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=783555
+
+2017-11-20  Kjartan Maraas  <kmaraas@gnome.org>
+
+	Updated Norwegian bokmål translation.
+
+2017-11-15  Michael Biebl  <biebl@debian.org>
+
+	Remove leftover hal bits
+	Those are no longer used after the tracker-miners split.
+
+2017-11-14  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 2.0.2
+
+	libtracker-miner: Avoid triggering content filters on configured roots
+	Folders being configured as indexing roots should win over any filter
+	that might apply. The basename based filters correctly skip configured
+	roots already, so do the same with the directory content filter.
+
+	The practical side effect is that .git folders are now allowed on the
+	directories configured in tracker-miner-fs (homedir and XDG dirs most
+	usually). Tracker tries to stay out of source code trees which are a
+	source of pointless grinding, but there's legit usecases to have these
+	folders under git management:
+
+	- User setups to bring in essential files across machines
+	- Collections managed through git-annex
+
+	Those are worth handling, even if the question also applies to folders
+	found recursively and the .git heuristic proves limited.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=790284
+
+	tests: Add test for ignored content in configured folders
+	There's some extreme cases where content filters in one configured
+	root result on deletes that leak through nested configured roots.
+	Add a testcase to catch this situation.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=790284
+
+	libtracker-miner: Rename function to be more obvious
+	We don't add a "file", but a whole RootData that may be recursively
+	crawled. Also, make the crawl_directories_start() from this function,
+	since that's the next thing to do in every calling place.
+
+	libtracker-miner: Fix possible leak
+	If we hit some early return conditions, the RootData would be
+	leaked.
+
+	libtracker-miner: Pass parent to _insert_store_info()
+	As both places doing this iterate directories one by one, we
+	can optimize GFile interning by providing an already interned
+	common parent.
+
+	This eases the GNode lookups in TrackerFileSystem, as we already
+	know the most direct parent GNode the file should have.
+
+	libtracker-miner: Avoid interning file for monitoring purposes
+	It doesn't bring any gains to use interned files when adding
+	directories to the TrackerMonitor. Just use the GFile we get
+	and avoid interning the directory this soon.
+
+	libtracker-miner: Small simplification on TrackerFileSystem
+	The implementation catered for GFiles being used from multiple
+	TrackerFileSystem instances. This is clearly overkill as we most
+	often have one (one miner per process) and even if there's multiple
+	miners in the same process, the Gfile instances are not
+	interchangeable.
+
+	This can just go away, and we instead ensure to create a duplicate
+	of the GFile if it actually belongs to another TrackerFileSystem,
+	which again is extremely unlikely.
+
+	libtracker-direct: Remove stray print()
+
+	libtracker-miner: Remove TrackerSparqlBuilder sparql buffer tasks
+	Those have been unused for a long time. We now only pass sparql
+	around as strings.
+
+	libtracker-miner: Remove bulk sparql buffer operations
+	Those have been unused for quite some time now.
+
+	tests: Use tmp dir on tests
+
+	libtracker-miner: Always use interned files when emitting ::file-deleted
+	There were other places that didn't ensure that TrackerFileNotifier used
+	interned files when emitting ::file-* signals.
+
+	tests: Minor update to TrackerMonitor test
+	Due to how the file is created, we shall get an additional UPDATED
+	event that TrackerMonitor doesn't merge together anymore. This is
+	now merged together in the upper layers, so just acknowledge the
+	extra event in this test.
+
+	tests: Remove "blacklisting" TrackerMonitor tests
+	TrackerMonitor doesn't try to merge events anymore besides the obvious
+	[CREATED|UPDATED]* + CHANGES_DONE_HINT. These tests simply don't reflect
+	current TrackerMonitor behavior so were removed.
+
+	tests: Minor update to TrackerFileNotifier test
+	Because the way the file is created, we will get a create and an update
+	here. TrackerMonitor won't merge those together anymore, but
+	TrackerMinerFS will, so just acknowledge it's expected in this test.
+
+	libtracker-miner: Clean up TrackerMonitor
+	We used to implement our own caching and timeout mechanism on top
+	of GIO's, and our own "blacklisting" that would merge or transform
+	events depending on the previouly cached content.
+
+	This adds quite some extra latency in some cases on top of
+	GFileMonitor's rate (up to 2s), and even in some cases do produce
+	mistaken results (CREATE(a)+MOVE(a->b) != CREATE(b) if you are rewriting
+	a file, but how can TrackerMonitor know).
+
+	The code has been simplified in various fronts:
+	- (Almost) no event caching. Only CREATED/UPDATED events are possibly
+	  cached awaiting for the CHANGES_DONE_HINT that must follow them.
+	- No event manipulation nor merging. GFileMonitor does a good job at
+	  being truthful, and the upper layers do know better how to coalesce
+	  events into a more reduced set of equivalent tasks, since there's
+	  further info like file state in the database.
+	- The deprecated SEND_MOVED flag has been replaced by WATCH_MOVES. The
+	  MOVED_IN/MOVED_OUT/RENAMED events can be handled in a simpler way each
+	  than the deprecated MOVED event.
+
+	Overall this makes TrackerMonitor slightly more verbose (but still
+	consistent wrt sending a meaninful sequential set of changes), but more
+	reactive overall, since we now solely rely on GFileMonitor rate limits.
+
+	With this change, TrackerMinerFS is left as the only place that does
+	coalescing of events.
+
+	libtracker-miner: Disable monitoring when dealing with unknown monitors
+	We just can't do safe assumptions about its limits or behavior, seems
+	best to turn monitoring off altogether.
+
+	libtracker-miner: Remove FEN directory monitor handling branch
+	The code supporting Solaris file monitors went away from glib ~2y
+	ago.
+
+	libtracker-miner: Remove ifdef around useful feature
+	The mentioned bug got fixed ~6y ago, but the changes making
+	use of the feature for some reason got stuck under a define
+	that's never defined.
+
+	This is an useful feature, so rely on it without further ado.
+
+	libtracker-miner: Remove dead TrackerMonitor code
+	The PAUSE_ON_IO feature required someone to notice it and
+	modify tracker code to #define instead of #undef. I discovered
+	it before, and chose to remove it instead.
+
+	libtracker-miner: Fix content filter with default policy=deny
+	We deemed the directory as bad whenever any file didn't match the
+	filter, but files that don't match the filter should not trigger
+	it in one way or another.
+
+	libtracker-miner: Intern GFiles on TrackerMonitor::item-moved
+	The assumption is that TrackerFileNotifier emits files that are
+	currently interned in the TrackerFileSystem. This event handler
+	broke the assumption in a couple of places.
+
+	libtracker-miner: Remove double caching of file IRI
+	This is doubly cached in the TrackerFileSystem and as GObject qdata (and
+	obtained from the former in that case). Let's just rely on the former for
+	all.
+
+	libtracker*: Lower g_message()s to g_debug()
+	This is library code, so let's use g_debug() which obeys G_MESSAGES_DEBUG,
+	instead of g_message() which shall be printed unless there is an special
+	log handler that filters those out.
+	This code may run on 3rd party code, where we can't trust we'll have
+	a log handler that catches those from going to stdout.
+
+	libtracker-miner: Fix argument order
+	Despite the order implied here, the source/dest GFiles were emitted in
+	the inverse order. Funnily tracker-miners and everything else around
+	gets the order right, so it's really the header definition what is
+	backwards here.
+
+	libtracker-miner: Remove unused quarks
+
+	libtracker-miner: Refactor processing queues
+	Replace all 4 queues for the different create/update/delete/move
+	events with a single queue that contains generic QueueEvent
+	structs. The GList node of the last event is stored as GFile
+	qdata, in order to perform fast lookups when coalescing events.
+
+	queue_event_coalesce() will attempt to convert any two events
+	into less than that, it does rely on merging two events with
+	no related events in between, those should be coalesced (or
+	attempted to) when they arrive.
+
+	libtracker-miner: Remove reentry counter and failed task reinsertion
+	TrackerFileNotifier guarantees that parent files are emitted before any
+	children, the other usecase that this used to cover are explicit
+	tracker_miner_fs_check_file() calls which used to also index parent
+	directories, but it doesn't do that anymore since quite some time.
+
+	So the only remaining case where we could end up with a file whose parent
+	is neither being currently processed nor indexed is actual bugs. In that
+	case, the bug likely won't go away by trying harder, which leads to logging
+	for every child file, as they'll fail in cascade.
+
+	Let's be less stubborn here, warn (once!) about the missing file and ditch
+	all pending events happening on/inside it. People love filing bugs about
+	tracker logging stuff, so I don't think bugs will go unnoticed anyway.
+
+	libtracker-miner: Use g_clear_pointer
+	Seems quite fit to manage priv->current_index_root.
+
+	libtracker-miner: Simplify code a bit
+	We can steal data sooner in order to avoid unsetting the data in the early
+	return path.
+
+	libtracker-miner: Properly honor TRACKER_DIRECTORY_FLAG_CHECK_MTIME
+	TrackerFileNotifier actually triggered mtime checks more often than
+	necessary. All of the sparql queries can be skip, also storing the
+	filesystem mtimes (because no sparql mtimes will be queried to
+	compare with).
+
+	We just need setting up our TrackerFileSystem tree, and adding
+	directory monitors, so do this bare minimum.
+
+	libtracker-miner: Drop GFile array argument from directory content queries
+	We always perform those one directory at a time, so drop the array/len
+	arguments from directory content queries, and just pass a GFile around.
+
+	libtracker-miner: Drop generic depth handling from TrackerFileNotifier
+	We currently always process directories one by one, but we preserved the
+	variable depth handling. This can be simplified away.
+
+	libtracker-miner: Remove TrackerCrawler max_depth argument
+	It was always called with depth=1 (return just direct children of the
+	given folder), so make this the default. Admittedly, the "crawler" name
+	is a bit of an stretch now.
+
+	The TrackerCrawler tests have also been removed the recursive tests,
+	since that's not possible anymore.
+
+	libtracker-direct: Implement update_array_async()
+	This doesn't yield as many benefits as it does bring on the DBus backend,
+	but still worth implementing for consistence.
+
+	tests: Add tests for libtracker-miner's TrackerMinerFS
+	This object can now be tested without raising tracker-store instances
+	nor other DBus facilities. This is a first stab at a comprehensive
+	set of tests checking TrackerMinerFS behavior (API, startup, monitoring,
+	...).
+
+2017-10-31  Sam Thursfield  <sam.thursfield@codethink.co.uk>
+
+	meson: Remove options that are only relevant to tracker-miners
+	The tracker-miners now live in a separate repo.
+
+	meson: Remove erroneous reference to tracker-parser-sha1.h.in
+	This file doesn't exist, we generate the header file from scratch with a
+	script. Meson seems to have not raised an error in this situation in the
+	past, but with 0.43 the build fails.
+
+	meson: Fix use of nonexistant 'default' keyword
+	The correct keyword is 'value'.
+
+2017-10-19  Sam Thursfield  <sam.thursfield@codethink.co.uk>
+
+	libtracker-common: Add tracker-seccomp from the libtracker-miners library
+	This module is only used in the tracker-miners repo. However, when
+	building this repo as a Meson subproject of tracker-miners.git, we
+	can only build one version of libtracker-common so we need to have
+	it present in our version.
+
+	meson: Don't install the nao-custom ontology
+	It's actually broken and doesn't get installed by the Autotools build.
+	The tracker-store refuses to start if this ontology is installed.
+
+2017-10-18  Sam Thursfield  <sam.thursfield@codethink.co.uk>
+
+	meson: Include the gresource ontology data in libtracker-data
+	Fixes an issue in tracker-store
+
+	meson: Install all GSettings schemas and enums
+	Some were missing altogether, and one was missing its enums which meant
+	it was rejected by the schema compiler.
+
+2017-10-12  Thomas Bechtold  <tbechtold@suse.com>
+
+	Correctly unref g_settings_schema
+	This fixes:
+
+	GLib-GObject-CRITICAL **: g_object_unref: assertion
+	'G_IS_OBJECT (object)' failed
+
+	when calling "tracker daemon"
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=788883
+
+2017-10-11  Thomas Bechtold  <tbechtold@suse.com>
+
+	tracker: Return correctly for {get,set}_log_verbosity
+	Every command switch should return properly. Otherwise the code
+	reaches g_warn_if_reached () and a warning is printed.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=788680
+
+2017-10-05  Carlos Garnacho  <carlosg@gnome.org>
+
+	tests: Remove unused queries from tracker-sparql-test
+	Those were unused (the test would stop at the third query), and I couldn't
+	quite figure out why they were added or what they were specifically
+	testing.
+
+	tests: Check return values for g_chmod/stat/remove calls
+	Makes sense testing for those. Spotted by Coverity (CIDS: 1188421,
+	1188422, 1188423, 1188430, 1188431, 1188432, 1188433, 1188434, 1188435,
+	1298206, 1298207, 1298208, 1298209)
+
+	tests: Make libtracker-data tests use separate directories
+	Those may run in parallel, which is troublesome if all of them try to
+	remove the test directory after all tests are run.
+
+2017-10-05  Xavi Ivars  <xavi.ivars@gmail.com>
+
+	[l10n] Updated Catalan (Valencian) translation
+
+2017-10-04  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 2.0.1
+
+2017-09-30  Piotr Drąg  <piotrdrag@gmail.com>
+
+	gschema: Fix gettext-domain
+
+2017-09-29  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-miner: Always fallback to URN query when queueing file
+	Tracker may end up with nfo:FileDataObject prior to handling monitor
+	events. Be it leftover data from previous bugs, explicit "tracker index"
+	calls, or data from some other application.
+
+	As we can't be really sure of the data consistence, always fallback to
+	a URN query so we don't break nie:url UNIQUE constraint (inverse functional
+	property in SPARQL parlance).
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=786132
+
+	libtracker-miner: Check directory updates before dropping mtime info
+	file_notifier_traverse_tree() has the side effect of deleting mtime data,
+	as it's presumably not needed anymore, except here. Check whether the
+	directory was updated before notifying of the files inside, so we can
+	thoroughly check for deleted content.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=786132
+
+	libtracker-miner: Use TrackerDecorator variable after checking cancellable
+	It may be actually destroyed if the decorator was cancelled.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=785701
+
+2017-09-29  Sam Thursfield  <sam.thursfield@codethink.co.uk>
+
+	libtracker-sparql: Introspection fix for tracker_notifier_new()
+	The tracker_notifier_new() function allows NULL for 'classes'.
+
+2017-09-28  Sam Thursfield  <sam@afuera.me.uk>
+
+	meson: Fix hardcoded TRACKER_API_VERSION=1.0
+	This was causing .pc files with wrong dependencies to be generated when
+	building with Meson, and probably other issues.
+
+2017-09-28  Sam Thursfield  <sam.thursfield@codethink.co.uk>
+
+	meson: Fix misspelled keyword arg
+
+2017-09-27  Sam Thursfield  <sam.thursfield@codethink.co.uk>
+
+	meson: NetworkManager should be an optional dep
+
+2017-09-27  Matej Urbančič  <mateju@svn.gnome.org>
+
+	Updated Slovenian translation
+
+	Updated Slovenian translation
+
+2017-09-22  Sam Thursfield  <sam@afuera.me.uk>
+
+	libtracker-sparql: Fix introspection for Tracker.Notifier.new()
+	The 'classes' parameter wasn't annotated correctly.
+
+	meson: Fix all hardcoded references to 1.0
+	In some places I had hardcoded '1.0' instead of honouring
+	tracker_api_version variable. This is now fixed.
+
+	docs: Update path that contains API version to 2.0 in man page
+	We should maybe reword this to not include the API version, but I can't
+	see a simple way right now.
+
+2017-09-20  Matej Urbančič  <mateju@svn.gnome.org>
+
+	Updated Slovenian translation
+
+	Slovenian update ...
+
+	Updated Slovenian translation
+
+2017-09-16  Carlos Garnacho  <carlosg@gnome.org>
+
+	tests: Remove stray semicolon
+
+	libtracker-remote: Fix compiler warning
+	The return value of the hashtable contents are not variable, so using
+	"var" rightfully complains about const being passed to non-const.
+
+	libtracker-data: Fix compiler warning
+	Use hashtables with nullable integer return value the vala way, instead
+	of using lookup_extended(), which both looks out of place and produces
+	constness related warnings on gcc.
+
+	libtracker-data: Mark private methods explicitly as private
+	This makes it easier to spot the interactions when reading code.
+
+	libtracker-fts: Only let stop words go through on prefix queries
+	Commit 63e507865 made stop words go through when tokenizing FTS5 query
+	search terms, in order to still provide matches for incompletely typed
+	search terms that happen to match a stop word.
+
+	This however brought the side effect that searching for a stop word in
+	combination with other terms renders the latter ineffective. As the stop
+	word has no tokens in the FTS5 table to match with, the whole query brings
+	no results.
+
+	Since that commit, SQLite fixed FTS5_TOKENIZE_PREFIX to work as advertised,
+	so limit the bypass to prefix queries (e.g. "onto*"), since it only makes
+	sense there. Also, invert the way we look for stop words (i.e. always lookup
+	those in search terms as per config, and do the bypass once we know we deal
+	with a stop word) for the sake of readability.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=787452
+
+	tests: Fix compiler warnings
+	Remove an unused variable, and fix several implicit .begin() calls.
+
+	tracker-store: Fix compiler warnings
+	Use backup_save() function with correct non-NULL arguments,
+	avoid an implicit .begin(), and fix CCode annotations for
+	a vala function.
+
+	libtracker-direct: Fix compiler warning
+	Handle GLib.Error on async queries.
+
+	libtracker-data: Fix compiler warnings
+	Several unused variables.
+
+2017-09-14  İbrahim Aydın  <brhm.1995@hotmail.com>
+
+	Update Turkish translation
+
+2017-09-12  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 2.0.0
+	Semantic versioning is now effective.
+
+2017-09-11  Debarshi Ray  <debarshir@gnome.org>
+
+	libtracker-control: Add migration docs
+	https://bugzilla.gnome.org/show_bug.cgi?id=787246
+
+2017-09-10  Philip Withnall  <philip@tecnocode.co.uk>
+
+	libtracker-control: Add missing return to function precondition
+	A follow-up to commit 9a17961b. Spotted by Coverity (CID 1456542).
+
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=787246
+
+2017-09-10  Ask Hjorth Larsen  <asklarsen@gmail.com>
+
+	Updated Danish translation
+
+2017-09-10  Anders Jonsson  <anders.jonsson@norsjovallen.se>
+
+	Update Swedish translation
+
+2017-09-10  Jordi Mas  <jmas@softcatala.org>
+
+	Fixes to Catalan translation
+
+2017-09-09  Inaki Larranaga Murgoitio  <dooteo@zundan.com>
+
+	Update Basque language
+
+2017-09-08  hanniedu  <hannie@ubuntu-nl.org>
+
+	Updated Dutch translation Master 3.26
+
+2017-09-06  Jordi Mas  <jmas@softcatala.org>
+
+	Update Catalan translation
+
+2017-09-04  Debarshi Ray  <debarshir@gnome.org>
+
+	libtracker-control: Let miner_manager_index_file accept a GCancellable
+	The Since tag was bumped because the method's signature has changed.
+	It is not backwards compatible with the one that was added in 0.10.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=787246
+
+2017-09-03  Rafael Fontenelle  <rafaelff@gnome.org>
+
+	Update Brazilian Portuguese translation
+
+2017-09-02  Dušan Kazik  <prescott66@gmail.com>
+
+	Update Slovak translation
+
+2017-09-02  Seong-ho Cho  <shcho@gnome.org>
+
+	Update Korean translation
+
+2017-09-01  Cheng-Chia Tseng  <pswo10680@gmail.com>
+
+	Update Chinese (Taiwan) translation
+
+2017-08-31  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-miner: Set up cancellable for TrackerDecorator internal ops
+	Those must be cancelled if the TrackerDecorator gets destroyed.
+
+	meson: Update root meson.build file
+	It still had some pre-split remnants.
+
+	docs: Remove unused manpages
+	These manpages persist on the tracker-miners module, they can be removed
+	from this repo.
+
+	tracker: Remove --all argument from "tracker status" subcommand
+	Make "tracker status --stat" offer info for all RDF classes right away,
+	instead of trying to figure out the "common" ones from the formats handled
+	by tracker extract modules/rules, which are not in this repo anymore.
+
+2017-08-31  Michael Biebl  <biebl@debian.org>
+
+	build: Drop obsolete _REQUIRED versions
+
+	build: Drop obsolete warning about seccomp
+	https://bugzilla.gnome.org/show_bug.cgi?id=787057
+
+2017-08-31  Jiri Grönroos  <jiri.gronroos@iki.fi>
+
+	Update Finnish translation
+
+2017-08-30  Jordi Mas  <jmas@softcatala.org>
+
+	Fixes to Catalan translation
+
+2017-08-28  Ask Hjorth Larsen  <asklarsen@gmail.com>
+
+	Updated Danish translation
+
+2017-08-27  Rūdolfs Mazurs  <rudolfsm@src.gnome.org>
+
+	Update Latvian translation
+
+2017-08-25  Carlos Garnacho  <carlosg@gnome.org>
+
+	meson: Fix SQLite FTS5 check
+	Can't compile without main()
+
+2017-08-25  Milo Casagrande  <milo@ubuntu.com>
+
+	Update Italian translation
+
+2017-08-23  Fabio Tomat  <f.t.public@gmail.com>
+
+	Update Friulian translation
+
+2017-08-22  Aurimas Černius  <aurisc4@gmail.com>
+
+	Updated Lithuanian translation
+
 2017-08-22  Carlos Garnacho  <carlosg@gnome.org>
 
-	Release 1.12.3
+	Release 1.99.3
+
+	meson: Fix typo in libtracker-sparql docs
+	Missing comma.
 
 	build: Mandate that sqlite3 >= 3.20.0 has fts5 builtin
 	That sqlite3 version brought incompatibilities in the fts5 interface,
@@ -16,18 +795,88 @@
 
 	https://bugzilla.gnome.org/show_bug.cgi?id=785883
 
-2017-08-16  Carlos Garnacho  <carlosg@gnome.org>
+2017-08-21  Carlos Garnacho  <carlosg@gnome.org>
 
-	user-guides: Fix typo in userguides miner DBus name
-	The miner name is "Userguides", not "UserGuides". Fixes pointless
-	spam from systemd because it tries to start a service that takes
-	a different name in the end.
+	libtracker-fts: Silence compiler warning
+	Complains that rc might be used uninitialized, but the loop is guaranteed
+	to have >0 elements, besides rank is initialized to 0. Initializing it to
+	SQLITE_OK will be fine.
 
-	https://bugzilla.gnome.org/show_bug.cgi?id=770793
+2017-08-20  Anish Sheela  <aneesh.nl@gmail.com>
+
+	Update Malayalam translation
+
+2017-08-19  Alexandre Franke  <alexandre.franke@gmail.com>
+
+	Update French translation
+
+2017-08-18  Pawan Chitrakar  <chautari@gmail.com>
+
+	Update Nepali translation
+
+	Update Nepali translation
+
+2017-08-17  Fran Dieguez  <frandieguez@gnome.org>
+
+	Update Galician translation
+
+2017-08-16  Pawan Chitrakar  <chautari@gmail.com>
+
+	Add Nepali translation
+
+2017-08-14  Мирослав Николић  <miroslavnikolic@rocketmail.com>
+
+	Updated Serbian translation
+
+2017-08-12  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-data: Initialize cursor variable
+	The variable may be used uninitialized, resulting on
+	invalid reads.
+
+	Spotted by Coverity (CID #1453480)
+
+	libtracker-miner: Remove useless debug output
+	All its info is already spewed on the critical warning right
+	above.
+
+2017-08-11  Piotr Drąg  <piotrdrag@gmail.com>
+
+	Update Polish translation
 
 2017-08-07  Carlos Garnacho  <carlosg@gnome.org>
 
-	Release 1.12.2
+	Release 1.99.2
+
+	Distcheck fixes
+
+	libtracker-data: Avoid doubly creating resource triggers
+	This code is run on table updates, in which case the triggers already
+	correctly exist. Ensure the trigger creation won't fail if it already
+	exists.
+
+	docs: Add example description file
+	This was not added on git.
+
+	libtracker-sparql: Document further new API
+
+	docs: Ignore the right header file
+	Fixes some duplicate reference warnings when building libtracker-sparql
+	docs.
+
+	libtracker-miner: Add migration docs
+
+	libtracker-sparql: Add migration docs
+
+	libtracker-miner: Improve docs
+	Remove no longer existing methods, add the newer objects/methods
+	that were missing, and add some further docs here and there.
+
+	libtracker-sparql: Update docs
+	The newer methods were still missing from API docs, add them
+	in the respective sections.
+
+2017-08-06  Carlos Garnacho  <carlosg@gnome.org>
 
 	libtracker-fts: Adapt to incompatible change in sqlite 3.20
 	From that version on, we must use the brand new sqlite3_bind_pointer()
@@ -36,23 +885,1216 @@
 
 	https://bugzilla.gnome.org/show_bug.cgi?id=785883
 
-2017-08-06  Carlos Garnacho  <carlosg@gnome.org>
+2017-08-05  Carlos Garnacho  <carlosg@gnome.org>
+
+	Merge branch 'wip/carlosg/resource-leak-fix'
+
+	libtracker-data: Perform trimming of unused resource URNs on shutdown
+	On shutdown it will now delete all elements in the Resource table that
+	are not contained too in the Graph table (thus are graph URNs) and have
+	a refcounting of 0 (meaning that they are not used in any class/property
+	table).
+
+	As the migration to refcounted Resource table doesn't result in graph
+	URNs being added to the Graph table, database cleanup won't be performed
+	until the Graph table has been populated (presumably by miners indexing
+	anything)
+
+	libtracker-data: Add Graph table
+	This new table will perform the accounting of those URNs used
+	as a graph on SPARQL updates. Those are kind of special in that
+	they are not referenced anywhere else, so we couldn't distinguish
+	between those and an entirely unused URN.
+
+	The creation of this new table has also been made to trigger
+	the recreation of all class tables, so the resource refcounting
+	changes in the previous commits become effective.
+
+	libtracker-data: Add resource element triggers
+	Those will control the Refcount column in the Resource table,
+	whenever a resource is added/removed from a resource or multivalued
+	property table, or whenever a single or multivalued property points
+	or stops pointing to a given resource, its refcount will be changed.
+
+	This adds automatic refcounting on elements, so we can tell those
+	with a refcount=0 are not referenced anywhere so thus can be dropped.
+
+	libtracker-data: Prevent ALTER TABLE from happening on new classes
+	This step should be only happening if the class is not new, despite
+	in_change being TRUE.
+
+	libtracker-data: Refactor Resource table creation
+	Instead of creating it just in time for the rdfs:Resource table,
+	create it in advance so we have a common hook for other essential
+	tables.
+
+	The "Available" column that we add to the main class is kind of
+	useless, but is preserved so older Tracker versions don't stumble
+	on a database created with a more modern Tracker.
+
+	We are also adding a "Refcount" column to the Resource table, which
+	will be used in the following commits.
+
+	libtracker-data: Use optional() to parse a few tokens
+	Fixes a bunch of "unchecked return value" warnings on coverity,
+	it's also clearer to read.
+
+	Spotted by Coverity (CID#: 1188417, 1188418, 1188428, 1452443,
+	1452445, 1452449)
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=785863
+
+	libtracker-data: Add optional() method for tokens that need no retval checks
+	Also makes code clearer, as accept() implies you may react differently on
+	token availability.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=785863
+
+2017-08-04  Mario Blättermann  <mario.blaettermann@gmail.com>
+
+	Update German translation
+
+2017-08-04  Sam Thursfield  <sam.thursfield@codethink.co.uk>
+
+	meson: Install ontologies and domain ontology rules
+
+2017-08-04  Balázs Meskó  <meskobalazs@fedoraproject.org>
+
+	Update Hungarian translation
+
+2017-08-04  Philip Withnall  <withnall@endlessm.com>
+
+	libtracker-data: Drop redundant error path
+	prepare_for_exec() defines iface as non-nullable, so Vala automatically
+	(and correctly) inserts a g_return_val_if_fail (iface != NULL) for us.
+	That makes this error path redundant and unreachable.
+
+	Spotted by Coverity (CID #1452447).
+
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=785809
+
+	libtracker-miner: Add missing break in property switch
+	Spotted by Coverity (CID #1452446).
+
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=785808
+
+2017-08-04  Sam Thursfield  <sam.thursfield@codethink.co.uk>
+
+	meson: Replace all source_root() and build_root() calls
+	These functions need to be avoided so that Tracker doesn't break when
+	included via subproject() into another Meson project.
+
+	meson: Fix tracker-parser-sha1.h generation when we're a subproject
+	I also added `-e` (fail on errors) to the script.
+
+	meson.build: Avoid using meson.source_root() to locate g-ir-merge
+	The meson.source_root() variable conflicts with a subprojects feature --
+	if Tracker is included as a subproject then source_root() will point to
+	the parent project and so we'll fail to find the g-ir-merge script.
+
+2017-08-03  Carlos Garnacho  <carlosg@gnome.org>
+
+	g-ir-merge: Use env to locate python3
+	Pointed out to fix build on FreeBSD, since python is not
+	in /usr/bin.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=782091
+
+	Remove all miners/extract/writeback
+	This is being split to its own package
+
+2017-08-03  Marek Cernocky  <marek_cernocky@conel.cz>
+
+	Updated Czech translation
+
+2017-07-28  Lucas Satabin  <lucas.satabin@gnieh.org>
+
+	rss: Add support for enclosures
+	Some feed (e.g. podcasts) use the `enclosure` element of the RSS feed
+	format. The ontology supports these element throught the
+	`mfo:enclosureList` relationship and `mfo:Enclosure` class.
+
+	Support for enclosures is simply added by looping over such elements if
+	any, and adding the relationships upon feed message insertion or update.
+	Enclosures are deleted when the `mfo:FeedMessage` that links to it is
+	deleted.
+
+	Also fixes a problem of double free when contributor list is not empty.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=785454
+
+2017-07-25  Daniel Mustieles  <daniel.mustieles@gmail.com>
+
+	Updated Spanish translation
+
+2017-07-24  Lubomir Rintel  <lkundrak@v3.sk>
+
+	libtracker-miner: port to libnm
+	It's the perferred NetworkManager's library for a couple of years now
+	already. Keep compatibility with the older one, since it's reasonably
+	similar.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=777178
+
+2017-07-24  Carlos Garnacho  <carlosg@gnome.org>
+
+	meson: Add optional upower/hal deps on tracker-miner-fs
+	Otherwise those fail to compile due to the missing includes/cflags.
+
+	meson: Fix bash completion dir guessing
+	Use the right method to fetch a pkg-config variable.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=785248
+
+	libtracker-data: Don't rely on spaces as separators on title collation
+	Skip non alphanumeric characters both at the beginning of titles, and after
+	the prefix match. Of course, require at least one such non alphanumeric
+	character after the prefix match, in order to avoid matching beginnings of
+	words.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=785146
+
+2017-07-23  Jeremy Bicha  <jbicha@ubuntu.com>
+
+	libtracker-data: fix format-security issue
+	https://bugzilla.gnome.org/show_bug.cgi?id=785245
+
+	build: meson: Fix upower-glib check
+	https://bugzilla.gnome.org/show_bug.cgi?id=785247
+
+2017-07-23  Michael Biebl  <biebl@debian.org>
+
+	Remove leftover @LIBTRACKER_MINER_PC_REQUIRES@ from tracker-miner.pc.in
+	Follow-up for commit ac84484dfb5dea636e4b2e830d25901413fb970c.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=785294
+
+2017-07-22  Kukuh Syafaat  <syafaatkukuh@gmail.com>
+
+	Update Indonesian translation
+
+2017-07-19  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-data: Use '|' as separator for title articles.
+	As suggested in https://bugzilla.gnome.org/show_bug.cgi?id=785146
+	and following https://bugzilla.gnome.org/show_bug.cgi?id=771348,
+	change the separator used for common articles.
+
+	Translators, apologies for the moving target.
+
+	Release 1.99.1
+
+	build: Cleanup TRACKER_COMPILATION defines from c_args
+	It is now defined globally, so can removed from specific targets.
+
+	build: Unbreak meson build
+	The change in 1b31260292 added somewhat clumsy meson support. The
+	C-side vapi is now required by the Vala-side vapi, but only the latter
+	is included when building the rest of the libraries. Since we can't
+	tell the build to ditch the vala vapi and include our merged/spiced up
+	tracker-sparql-2.0.vapi file, add a dependency on the C vapi that we can
+	add on the selected places.
+
+	A side effect of including the unfixed vapis is that includes point
+	to internal files, so make sure everything gets TRACKER_COMPILATION
+	when building to circumvent it.
+
+	libtracker-sparql: Fix tracker-sparql-2.0.vapi generation
+	It would be left partly including headers that must not be accessed
+	directly. Also, ensure that we look for the C vapi file in srcdir for
+	both meson and autotools.
+
+	libtracker-data: Implement tracker:title-order() SPARQL function
+	This is a tracker-specific helper function that will remove the
+	initial common articles (the, a, an, ...) for sorting purposes.
+	This is implemented as an additional collation, so tracker:title-order
+	only makes sense to be used in the ORDER BY clause.
+
+2017-07-18  Fabio Tomat  <f.t.public@gmail.com>
+
+	Update Friulian translation
+
+2017-07-17  Rico Tzschichholz  <ricotz@ubuntu.com>
+
+	libtracker-miner: Fix introspection warning due header/source-def mismatch
+
+2017-07-16  Carlos Garnacho  <carlosg@gnome.org>
+
+	tracker-store: Check wal threadpool existence before using it
+	During shutdown the thread pool might be actually gone. Do not try to poke
+	it in those situations, a blocking wal checkpoint will happen eventually.
+
+2017-07-16  Emmanuele Bassi  <ebassi@gnome.org>
+
+	build: Add generated enumeration files to BUILT_SOURCES
+	Dependency tracking in Automake is a side effect of compilation. This
+	means two things:
+
+	  * headers are ignored when it comes to building dependencies, even
+	    when listed inside sources for a binary target
+	  * generated headers included inside source files are not used
+	    as a dependency until compilation of the source file completes
+	    successfully
+
+	If binary target L depends on a source file C, and that source file
+	includes a generated header H, there is no guarantee that the header
+	H will be available by the time source file C is built, because the
+	dependency is extracted from C itself, not from the list of sources.
+	Additionally, any header H does not count towards the dependency
+	resolution because headers are only used for ancillary features, like
+	extracting tags.
+
+	For this reason, Automake has `BUILT_SOURCES`.
+
+	This is a bit of obscure corner of Automake that trips up many who are
+	not practitioners of the Dark Arts.
+
+	More information is available here:
+
+	https://www.gnu.org/software/automake/manual/html_node/Built-Sources-Example.html#Built-Sources-Example
+
+2017-07-15  Carlos Garnacho  <carlosg@gnome.org>
+
+	tracker-miner-fs: Fix signal prototype of TrackerMinerFiles::writeback
+	It's defined a boolean return value, which was not obtained when emitting
+	the signal. Agree everywhere on removing it since it's not necessary.
+	Fixes a crash when the signal was emitted.
 
 	libtracker-data: Do not reuse TrackerDBInterface used for DB checks
 	It is just too soon to let it initialize like the others, just drop it
-	and let the TrackerDBManager create proper ones on demand.
-	(Cherry picked from commit 5c61827 on master)
+	and let the TrackerDBManager create proper ones on demand. Fixes possible
+	crashes on FTS because the TrackerOntology is still empty, so the
+	TrackerDBInterface ends up with 0 cached FTS properties.
 
-	https://bugzilla.gnome.org/show_bug.cgi?id=785876
+	https://bugzilla.gnome.org/show_bug.cgi?id=784926
+
+2017-07-13  Dušan Kazik  <prescott66@gmail.com>
+
+	Update Slovak translation
+
+2017-07-12  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-miner: Disable monitors during crawling on large indexing trees
+	If the number of indexed folders exceed the TrackerMonitor limit,
+	acknowledge that the filesystem image shall be possibly out of date soon
+	and disable monitors temporarily during crawling.
+
+	This results in a major speedup in the crawling phase (both initial indexing
+	and the one performed on every startup to update the Tracker concept of the
+	filesystem), because an excessive amount of directory monitors make the
+	syscalls performed during crawling inherently slower.
+
+	Testing with the same sample folders than commit 2e7e70a2ea (and the same
+	quarter million files in 17k folders), this results on ~4x faster
+	tracker-miner-fs startups. The accumulated improvements took regular startup
+	stituations (i.e. just ensuring the filesystem is up-to-date) from roughly
+	4m to 22s here. Everything measured on i7/ssd, otherwise idle, ...
+
+	libtracker-miner: Add TrackerMonitor function to check the limit
+
+2017-07-11  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-data: Do not accept "... AS foo" anymore
+	Nowadays this is pretty useless nonstandard syntax, SPARQL1.1 settled on
+	".... AS ?foo" and we've accepted it for a long time.
+
+	libtracker-sparql: Implement tracker_sparql_connection_get_namespace_manager()
+	This is implemented on direct connections and the generic backend. The
+	TrackerNamespaceManager will be filled in from the internal ontologies, as
+	read by the TrackerDataManager.
+
+	libtracker-data: Add tracker_data_manager_get_namespaces()
+	This will be used to fill in TrackerNamespaceManager objects that are
+	specific to a TrackerSparqlConnection.
+
+	libtracker-sparql: Add vapi file for the C portions
+	Just like we do with girs, merge together the vapi for the C portions and
+	the generated vapi for the vala bits. This allows using
+	TrackerNamespaceManager and TrackerResource from vala code.
+
+	libtracker-sparql: Deprecate TrackerSparqlBuilder
+	It has been superseded by TrackerResource, it is encouraged for new
+	development.
+
+	libtracker-miner: Drop TrackerSparqlBuilder from TrackerDecorator API
+	Just add tracker_decorator_info_complete[_error] functions to let the
+	decorator implementation give back the resulting SPARQL. This way the
+	TrackerDecorator API is agnostic of the method/API used to build the
+	SPARQL.
+
+	libtracker-sparql: Fix horrible confusion with G_GINT64_FORMAT
+	The "d" is already implied there, not for us to add. Let's pretend this
+	never happened...
+
+	libtracker-miner: Remove deprecation annotation from vapi file
+	This applied to ignore_next_update(), which has been removed for 2.0.
+
+	libtracker-sparql: Add tracker_resource_[add|set]_take_relation()
+	These are C helper functions, so users may create trees of TrackerResources
+	without having to manually unref all non-root ones.
+
+	docs: Remove doc references to TrackerEnumerator
+
+	libtracker-sparql: Remove get_direct(_async|_finish)
+	Those functions have been deprecated for years and are being removed
+	for 2.0. Use tracker_sparql_connection_get() and async variants instead,
+	that will smartly use the direct connection underneath.
 
 2017-07-10  Jeremy Bicha  <jbicha@ubuntu.com>
 
 	Fix Spanish translation header
 	See https://bugzilla.gnome.org/show_bug.cgi?id=771765
 
+2017-07-10  Kukuh Syafaat  <syafaatkukuh@gmail.com>
+
+	Update Indonesian translation
+
+2017-07-10  Carlos Garnacho  <carlosg@gnome.org>
+
+	tests: Adapt tracker-backup-test to non-GPrivate interfaces
+	This code relies on being able to query again the contents immediately
+	after restore, this may or may not be true depending on the
+	TrackerDBInterface used on the posterior query (eg. not being the one
+	that performed the update).
+
+	Since testing access from multiple DBInterfaces is not in the scope
+	of this test, just add an extra TrackerDataManager initialization in
+	between to ensure the interface used on the query is up to date.
+
+	libtracker-data: Don't use GPrivate to store TrackerDBInterfaces
+	The improvement is twofold here. On one hand ensures there's no
+	confusions with multiple TrackerDBManagers, because we had no guarantees
+	that a thread would be reused across those.
+
+	But also we can be much smarter about which TrackerDBInterface we
+	hand for operations, giving one that is "free" (i.e. has no other
+	active cursors) gives much more reduced mutex contention on stress
+	loads.
+
+	The maximum number of interfaces has been obtained rather
+	unscientifically, seems the turning point at which throughtput does
+	not really increment on downright stupid workloads, given the amount
+	of readonly threads we allow on the direct connection.
+
+	libtracker-data: Make all other ifaces than wal/writable readonly
+	The interfaces returned by tracker_data_manager_get_db_interface()
+	are now ensured to be only used in select queries, so be bolder
+	about this and ensure the interfaces are actually readonly.
+
+	libtracker-data: Make writable/wal interfaces unique
+	Instead of "picking" one of the several DB interfaces created,
+	ensure canonical ones for these operations.
+
+	libtracker-data: Pass DB interface to tracker_data_query_resource_id()
+	This is used on both readonly and readwrite paths, pass the DB interface
+	explicitly to avoid confusions wrt the one that must be used.
+
+	libtracker-miner: Fix cancellation of data_provider_begin()
+	The async op is not owner of the user data, so it may be actually
+	gone in the GAsyncReadyCallback. Ensure we only use it on success
+	or on other errors than cancelled, fixes crashes in tracker-crawler
+	crawl-interrupted test after commit b4f7b84fe4 because
+	tracker_crawler_stop() is now called at a time that triggers this.
+
+2017-07-10  Piotr Drąg  <piotrdrag@gmail.com>
+
+	Update POTFILES.in
+
+2017-07-10  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-miner: Ensure sparql buffer keeps flushing
+	The sparql buffer might get full again with new tasks before the
+	update_array operation for the current batch returned. In this case
+	nothing will kick the TrackerMinerFS again, nor the SPARQL buffer
+	from flushing again. Fix this by just flushing again, the miner
+	will follow as soon as the SPARQL buffer is below limits.
+
+	libtracker-data: Set interfaces' prepared statement LRUs on common code
+	All DB interfaces get the max number of items set, so just set those
+	in common code. Also, avoid allocating any space for update statements
+	in readonly interfaces.
+
+	libtracker-miner: Call next_files_async() in batches
+	Instead of painstakingly requesting GFileInfos one by one,
+	request several of those in a single batch. This is a lot easier
+	to the main loop, because we don't need hitting it several times
+	per file.
+
+	This and the previous commits result in massive speedups to
+	TrackerMinerFS, since CPU time in userspace during TrackerMinerFS
+	activity was largely dominated by GSource and main loop overhead.
+	Somewhere around 1.80x-2x faster for initial indexing, and up to
+	3x faster for startup on an already indexed FS, from unscientifical
+	testing with a quarter million files contained in ~17K folders.
+
+	libtracker-miner: Remove Tracker[File]Enumerator
+	This is a pretty pointless shallow wrapper to GFileEnumerator. Just make
+	TrackerDataProvider offer GFileEnumerators. If anyone ever was in need for
+	implementing a TrackerEnumerator, they can do the very same by implementing
+	GFileEnumerator, and handing those from their TrackerDataProvider impl.
+
+	This also cuts a level of indirection in directory crawling (i.e. no
+	wrapping of GTasks in GTasks), and allows us to fully use GFileEnumerator
+	API (eg. g_file_enumerator_next_files will be handy).
+
+2017-07-09  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-miner: Process TrackerMinerFS elements in batches
+	This prevents us from hitting too hard the main loop.
+
+	libtracker-miner: Shortcut the initial op after tracker_crawler_start()
+	It is well known, and will already happen asynchronously, no need to hit
+	the main loop for that.
+
+	libtracker-miner: Process TrackerCrawler elements in batches
+	This prevents us from hitting too hard the main loop.
+
+	libtracker-data: Preserve ontology journal writer for a bit longer
+	It's destroyed far too soon if the ontology needs rebuilding.
+
+2017-07-06  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-data: Add explicit shutdown call to TrackerDataManager
+	As DB interfaces will have a reference each on the TrackerDataManager,
+	callers will never drop the last reference themselves. Add an
+	explicit shutdown() call that just runs the dispose phase, and
+	destroy the TrackerDBManager on it.
+
+	Destroying the DB manager will tear down the writeable DB interface
+	and unlink the "is running" file. Any remaining readonly DB interfaces
+	presumably don't need the DB manager anymore and will disappear as
+	soon as all their remaining cursors are closed.
+
+	Release 1.99.0
+
+	libtracker-miner: Fix warnings if move ops happened during initial crawling
+	The checks to notify about indexing having finished on TrackerIndexingTree
+	roots were mistaking ItemMovedData* with GFile*, which lead to warnings.
+	This should be harmless, the signal might be possibly emitted before the
+	move op is dispatched, that's all.
+
+	tracker-miner-fs: Request source item URN as expected
+	When the code to handle SPARQL updates related to move operations
+	moved from libtracker-miner to tracker-miner-fs, we started querying
+	the dest file here, which would return a NULL URN as expected, since
+	it doesn't "exist" yet.
+
+	miners: Request DBus name after creating miner objects
+	Fixes those not seeming to autostart properly through the
+	"tracker daemon -s" CLI command, because it calls for a method
+	in an object that's not yet created at the time the DBus name
+	is visible.
+
+	libtracker-miner: Add missing ::move-file signal
+	Fixes handling of moved files, since the subclass vmethod wouldn't
+	be triggered.
+
+2017-07-03  Sam Thursfield  <sam@afuera.me.uk>
+
+	meson: Rearrange dependencies until things compile
+	Targets far down the dependency chain were failing due to mysteriously
+	missing symbols. The use of -Wl,--as-needed seemed to be triggering the
+	issue.
+
+	This only occured with new versions of Meson. Previously circular
+	dependencies would be added recursively but this was removed with
+	<https://github.com/mesonbuild/meson/pull/1545>.
+
+	I'm not 100% sure how this fixes things, but I think that removing
+	or at least reshuffling circular dependencies of libtracker-sparql
+	means that libraries are passed to the linker in "correct" order.
+
+2017-07-03  Piotr Drąg  <piotrdrag@gmail.com>
+
+	Use glib preset for i18n
+	https://bugzilla.gnome.org/show_bug.cgi?id=783750
+
+2017-07-03  Carlos Garnacho  <carlosg@gnome.org>
+
+	configure: Do not generate src/plugins/Makefile
+	Makefile.am is not there anymore.
+
+	utils: Remove gtk-sparql util
+	It's not even ported to pygi, it could go to examples/ if refurbished,
+	but there's aplenty on internet.
+
+	utils: Remove clean-tracker-prefix script
+	We've got make/ninja uninstall for that.
+
+	Delete tracker-needle
+	It was cool when Tracker search was barely integrated anywhere.
+	Nowadays, it's nothing but an aging showcase app (eg. was conceived
+	in the gtk2 days and barely ported to gtk3, and it shows everywhere).
+
+	If you want a modern and capable search UI, try Nautilus. If you
+	are outraged that tracker-needle is gone and ended up here, by all
+	means be my guest, reset to the parent of this commit and take it
+	out of tree. If you join #tracker I'll gladly give you advise on
+	how could it be brought up-to-date. But our hands are full, sorry,
+	we leave cool UIs to others.
+
+	Delete tracker-preferences
+	This is a mix of store and miner features which can't be assumed to go
+	together. It is better to leave configuration UI up to the environment,
+	in the GNOME case this is gnome-control-center search panel.
+
+	For settings that fall in the cracks, or for environments that don't
+	integrate Tracker search in their configuration UI, there's the rather
+	capable dconf-editor which will provide all toggles, and will explain
+	them better than any UI we may have.
+
+	In the future the CLI tools might gain some configuration subcommand,
+	but it will not be a graphical UI.
+
+	Delete evolution/thunderbird/nautilus/firefox plugins
+	Those are unmaintained, are broken, don't compile, or a combination of
+	all. Sadly there hasn't been enough manpower during the last years to
+	keep those up to par. Future seems shiny enough for nautilus, as the
+	features are being developed in-tree.
+
+	If anyone ever remembers there were such plugins and misses them
+	enough to take over maintainership, by all means reset to the parent
+	of this commit and take those out of tree. You will have my gratitude.
+
+	Thanks too to everyone who ever contributed in those plugins, I'm
+	not happy to let that much work go.
+
+	libtracker-miner: Remove writeback API
+	The only user that might ever care does already implement it itself.
+	There is no need to provide this infrastructure that will be scarcely
+	used in libtracker-miner API.
+
+	tracker-miner-fs: Implement writeback atop TrackerMinerFS
+	This implementation just pauses the miner while there's writeback
+	items to process, and uses the filter_event vmethod to perform
+	maintenance of writeback tasks. Functionally, is not that different
+	from the TrackerMinerFS implementation.
+
+2017-07-02  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-miner: Add filter_event vmethod
+	This is not a signal because external users of a TrackerMiner have no
+	business in modifying behavior at this level, this is reserved for
+	subclasses that presumably know what they are doing.
+
+	This vmethod is toggled for every event that gets received from the
+	TrackerFileNotifier, before the file gets to hit any processing queue.
+
+	tests: Add missing macros to meson build instructions
+	Those were added on autotools, but were forgotten on meson...
+
+2017-07-01  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-fts: Skip loading the FTS module if sqlite has it builtin
+	It is unneeded, and the missing symbol will be treated as a fatal error.
+
+2017-06-29  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-data: Fix compile errors with --disable-journal
+
+	libtracker-data: Allow using older sqlite API
+	But warn about it, as it is unsafe.
+
+	Merge branch 'wip/carlosg/domain-ontologies'
+
+	libtracker-common: Add a last resort envvar to load default domain ontology
+	This can only be used if the default domain ontology file is not found, and
+	is now used on tests that do rely on the default tracker-store instance.
+
+	Also, add back the TRACKER_DB_ONTOLOGIES_DIR, under the same restrictions.
+
+	libtracker-miner: Add connection property to TrackerFileNotifier
+	So it can be specified from the miner.
+
+	tracker-store: Use wal_checkpoint API from TrackerDBInterface
+	Better than calling the pragma and involving prepared statements
+
+	libtracker-data: Make Tracker.DBStatement an InitiallyUnowned in vapi
+	It does not matter much since the getter still returns a sunk reference,
+	but better to be consistent with the real implementation.
+
+	libtracker-control: Skip miners not meant to be loaded.
+	This will make the miners not specified in the domain ontology
+	description file invisible from the API user perspective.
+
+	tracker-store: Add all known tracker miners to default domain ontology
+	So it still behaves as it used to do.
+
+	libtracker-common: Add domain ontology key/api to get expected miners
+	This is purely a hint, and people may still run things manually or perform
+	updates against this domain ontology themselves. Will be useful so we don't
+	autostart more miners than necessary through the libtracker-control API.
+
+	tracker-store: Remove ontology_name argument
+	We do already deal with ontology locations at this point, which
+	we also print.
+
+	libtracker-data: Fix compilation on DISABLE_JOURNAL
+	Pass the TrackerDataManager down tracker_backup_save(), so we can
+	fetch the DB file underneath.
+
+	tracker-extract: If there is a domain, set watch on it
+	And exit as soon as the name vanishes. It may safely continue
+	its operations on the next startup.
+
+	tracker-miner-apps: If there is a domain, set watch on it
+	And exit as soon as the name vanishes. It may safely continue
+	its operations on the next startup.
+
+	tracker-miner-fs: If there is a domain, set a watch on it
+	And exit as soon as the name vanishes. It may safely continue
+	its operations on the next startup.
+
+	tracker-miner-rss: If there is a domain, set watch on it
+	And exit as soon as the name vanishes. It may safely continue
+	its operations on the next startup.
+
+	tracker-store: If a domain is set, set a watch on it
+	Tracker-store will wait till there are no elements left before
+	exiting, in order to ensure it does so cleanly.
+
+	libtracker-miner: Make TrackerMinerProxy look for the right tracker-store
+	Use the domain name to find out the right tracker-store DBus name.
+
+	libtracker-data: Ensure we set user data on an existing connection
+
+	tracker-miner-rss: Look up the right dbus name for GraphUpdated
+	This should be ported to TrackerNotifier, which already does the right
+	thing.
+
+	libtracker-sparql-backend: Ensure we always load the bus connection first
+	Otherwise the database might not be created yet when creating the direct
+	connection.
+
+	libtracker-common: Use XDG_DATA_DIRS to find domain ontology definitions
+
+	libtracker-control: Add domain argument to tracker_miner_manager_new_full
+	I personally prefer using the excuse of the major version bump than adding
+	a tracker_miner_manager_new_fuller() variant, as this is clearly a
+	construct_only thing. Creating a TrackerMinerManager with an specific
+	domain will allow dealing with the miners spawned for it.
+
+	libtracker-control: Remove obscure environment variables
+	These were supposedly added for testing, but they are not used
+	anywhere, nor it sounds ok to fundamentally change TrackerMinerManager
+	behavior. Let's remove these.
+
+	miners: Add NameSuffix field to miner .service files
+	This will be used by TrackerMinerManager in order to find out
+	the right dbus names according to the domain ontology.
+
+	tracker-miner-fs: Drop standalone DBus name for Files.Index
+	Because we're registering 2 interfaces and 2 dbus names, both
+	expose the same 2 interfaces and are introspectable the same way.
+	This makes no sense, just use the org.freedesktop.Tracker1.Miner.Files
+	name for both interfaces.
+
+	libtracker-miner: Add TrackerMiner::connection property
+	So it is possible to use TrackerMiner facilities in-process using
+	a dedicated TrackerSparqlConnection. Basically store and mining
+	handled by the client app.
+
+	libtracker-sparql: Make TrackerNotifier check GraphUpdated from the domain
+	It must listen to the signal from the right tracker-store instance.
+
+	rss: Add --domain-ontology switch
+	This allows tracker-miner-rss to dump data on other domain ontologies
+	than the default one.
+
+	tracker-extract: Add --domain-ontology switch
+	This allows tracker-extract to dump data on other domain ontologies
+	than the default one.
+
+	tracker-miner-apps: Add --domain-ontology switch
+	This allows tracker-miner-apps to dump data on other domain
+	ontologies than the default one.
+
+	tracker-miner-fs: Add --domain-ontology switch
+	This allows running tracker-miner-fs on other domain ontologies
+	moderated by a tracker-store daemon. The switch does:
+	1) Set up the ontology domain for the default TrackerSparqlConnection
+	2) Make the miner use a DBus name relative to the domain
+
+	In result, tracker-miner-fs can take a different DBus name and talk
+	to other tracker-store instances than the default.
+
+	libtracker-sparql: Use TrackerDomainOntology on tracker_sparql_connection_get()
+	Add a global tracker_sparql_connection_set_domain() call that allows setting
+	domain ontology that the client shall use. This only affects the connection
+	obtained through tracker_sparql_connection_get(), other constructors may have
+	different settings.
+
+	libtracker-sparql-backend: Set namespace on Log object
+	So we can include libtracker-common vapi without conflicts
+
+	tracker-store: Use TrackerDomainOntology helper
+
+	tracker-store: Install default domain ontology
+	This makes Tracker behave as it ever used to. Also add some comments
+	so it serves as a base for other domain ontologies.
+
+	libtracker-common: Add TrackerDomainOntology helper
+	This just wraps the information that can be extracted from a
+	domain ontology rule file.
+
+	tracker-store: Make DBus unique name purely dependent on the domain
+	i.e. just remove the ontology name from there. We do add the ".Tracker1"
+	suffix though, just so Tracker gets its own namespace dependent on it, eg:
+	org.gnome.Photos.Tracker1
+	org.gnome.Photos.Tracker1.Miner.Files
+	org.gnome.Photos.Tracker1.Miner.Extract
+
+	tracker-store: Remove fine-grained domain ontologies CLI switches
+	Only allow --domain-ontology/-d to specify the rule name. There is too
+	much room for failure making it possible to provide all switches manually
+	(eg. missing ones, or pointing to the wrong location).
+
+	The ontology rules are installed at /usr/share, so presumably the author(s)
+	know what they are doing.
+
+	tracker-store: Remove dbus_path domain ontologies setting
+
+	tracker-store: Register all objects with default DBus paths
+	Let's make the DBus name customizable, but making the DBus paths
+	customizable too seems a bit overkill. It is fine to have multiple
+	services implementing /org/freedesktop/Tracker1/* objects
+
+	libtracker-miner: Add TrackerMinerProxy object
+	And shift all miner dbus handling from TrackerMiner. This object
+	takes a TrackerMiner and implements the org.freedesktop.Tracker1.Miner
+	interface for it on DBus.
+
+	One notable difference in handling here is that libtracker-miner
+	does not try to own DBus names anymore, that is left up to the caller.
+	The registered object will be available on whatever dbus name the
+	caller does register.
+
+	For compatibility, all TrackerMiner implementations around have been
+	made to request their usual name.
+
+	libtracker-miner: Fix TrackerMiner::progress signal arguments
+	The signal marshaller has an extra argument, that was not available in
+	the class method.
+
+	libtracker-miner: Merge tracker_miner_fs_check_file[with_priority]
+	Only check_file() remains, with an extra priority argument. The default
+	G_PRIORITY_HIGH in the older check_file() was unintuitive, and is now
+	explicitly specified in the org.freedesktop.Tracker1.Miner.Files.Index
+	interface calls.
+
+	libtracker-miner: Remove tracker_miner_fs_check_directory*()
+	More unused API that is a thin wrapper to TrackerIndexingTree, just
+	remove it.
+
+	libtracker-miner: Remove TrackerMinerFS API to add/remove directories
+	The whole set of tracker_miner_fs_add_directory_without_parent(),
+	tracker_miner_fs_directory_add(), directory_remove() and
+	directory_remove_full() are all covered by TrackerIndexingTree and
+	basically unused, except for code in examples/.
+
+	libtracker-miner: Remove tracker_miner_fs_[sg]et_initial_crawling()
+	It did nothing at the libtracker-miner level, and can be safely removed.
+
+	tracker-miner-fs: Implement initial crawling fully here
+	It seems this setting was just ignored at on libtracker-miner since the
+	introduction of TrackerFileNotifier. And it does not make a lot of sense
+	either, crawling is done for 2 purposes: checking mtimes and setting up
+	monitors.
+
+	So we have individual toggles for each of those, but if neither happens
+	we could just not start the miner as well, which is most similar to the
+	tracker-miner-fs behavior when this setting was introduced.
+
+	libtracker-miner: Remove tracker_miner_fs_set_mtime_checking()
+	This is just used to set the TRACKER_DIRECTORY_FLAG_CHECK_MTIME flag on
+	the TrackerIndexingTree for all files. Given libtracker-miner has this
+	fine grained switch and all use of it happens in src/miners/fs, just move
+	the global toggle there and remove it from libtracker-miner API.
+
+	The only usage of this flag inside libtracker-miner happened inside
+	tracker_miner_fs_directory_add(), which was superseded by
+	TrackerIndexingTree too and is scheduled for removal.
+
+	tracker-miner-fs: Adopt TrackerThumbnailer from libtracker-miner
+	It makes no sense to have that at the library level, just move thumbnail
+	handling to TrackerMinerFiles.
+
+	Coincidentally, this removes further queries that required knowledge about
+	the ontology in TrackerMinerFS.
+
+	libtracker-miner: Remove tracker_miner_fs_force_recheck()
+	It's unused and unneeded, just set the TRACKER_DIRECTORY_FLAG_CHECK_MTIME
+	flag on the TrackerIndexingTree.
+
+	libtracker-miner: Remove tracker_miner_fs_force_recheck()
+	It's been a no-op for years.
+
+	libtracker-miner: Remove tracker_miner_fs_get_parent_urn()
+	It is cached once to be used once. Besides, the parent GFile is
+	obviously guaranteed to be a folder, and folders are (not so
+	obviously) guaranteed to be cached. Thus looking up the URN should
+	be fast enough.
+
+	libtracker-miner: Add TrackerMinerFS::move-file vmethod
+	We delegate the SPARQL generation to this vmethod, in order to
+	keep TrackerMinerFS as agnostic of the ontology as possible.
+
+	libtracker-miner: Split ::remove-file into two signals
+	The only_children argument is a bit awkward as we emit ::remove-file
+	on a file that is not removed at all. The TrackerSparqlBuilder argument
+	has been also removed (the signals just have a gchar* return value
+	containing the SPARQL for the delete op) so it's up to the caller to
+	decide how to compose the SPARQL.
+
+	This allows removing some more knowledge about specific ontologies
+	from TrackerMinerFS, the ontology-dependent upper layers will know
+	better how to delete the corresponding entities.
+
+	libtracker-miner: Change API of ::process-file[-attributes]
+	There's a few changes here:
+	- The 2 vmethods are now given a GTask, its cancellable is to be
+	  used if the handling goes async.
+	- tracker_miner_fs_file_notify() has changed into a more generic
+	  tracker_miner_fs_notify_finish() method, that takes such GTask
+	  and completes it.
+	- The vmethods are no longer given a TrackerSparqlBuilder, instead
+	  they are expected to create the SPARQL through whatever mean is
+	  most fit. The sparql is given in the tracker_miner_fs_notify_finish()
+	  func. This opens the door to TrackerMinerFS implementations using
+	  TrackerResource.
+
+	The intent is 1) Pass something to these vmethods that the user
+	can't forge or mess with, as matching on GFile relies that it's the
+	same pointer that it was given in the vmethods. And 2) Make the finish()
+	function more generic to be fit to other methods going async.
+
+	Remove ignore_next_update() API
+	It's been deprecated for a long time, it stands in the middle of
+	detaching TrackerMiner from DBus, and it's one less piece of
+	ontology-dependent libtracker-miner code. Enough reasons to
+	finally remove this.
+
+	Remove libmediaart code entirely
+	The libmediaart dependency was disabled in commit 6a05068624bfa, it
+	doesn't make sense to drag this code around.
+
+	docs: Ensure to create the output dir in ttl2sgml
+
+	docs: Remove duplicated code
+	Move these functions to ttl_model instead of keeping several
+	copies around.
+
+	docs: Remove "see also" section from ontology class documentation
+	The link is also included (from the description file, not guessed) in
+	the main ontology overview page. That seems sufficient.
+
+	docs: Do not add copyright by default on the ontology doc tool
+	Even less that one. The doc tool is not in the position to decide the
+	ontology copyright at all.
+
+	docs: Generate documentation for internal ontology in libtracker-sparql
+
+	docs: Unify ontology documentation tools
+	Now we have a single tool for the general ontology documentation
+	and the per-class/property one.
+
+	docs: Remove dead code
+	This is basically unused, we use prefixes from ontology files
+	themselves.
+
+	docs: Use xi:include to optionally load ontology explanations
+	Less toggles on the doc generation tool, more seamless documentation
+	blending. Sounds like win-win.
+
+	docs: Add documentation around creating and maintaining ontologies
+	If we now expose that detail to users, it's better to have it
+	documented properly.
+
+	libtracker-data: Remove static variable
+	Just keep the current journal filename number in the TrackerDBJournal.
+
+	libtracker-fts: Avoid static variables
+	Just keep a per-interface table of FTS properties in order to
+	calculate weights.
+
+	libtracker-data: Make TrackerDataManager a non singleton
+	There can now be multiple instances looking into separate database
+	and journal locations. TrackerDataManager has been made an initable
+	too, and busy handling has been lifted to a signal, in order to
+	reduce the arguments at new() a bit.
+
+	libtracker-data: Remove TrackerDBInterface busy functions
+	We can't report progress from updates anyway, it doesn't make sense
+	to spam the same state over and over. Just call the busy handler
+	directly in the only place it's being used, at the beginning of the
+	integrity check.
+
+	libtracker-fts: Remove tracker_fts_init/shutdown functions
+	Instead, load the FTS extension in every TrackerDBInterface manually.
+
+	libtracker-fts: Pass TrackerDBInterface through FTS machinery
+	It will be useful in order to retrieve the data manager, and the
+	TrackerOntologies.
+
+	libtracker-data: Add API to attach user data to TrackerDBInterfaces
+	This will be used to attach the data manager.
+
+	libtracker-data: Drop unused function
+
+	libtracker-data: Make tracker-data-update.c a non singleton
+	In order to avoid messing much with API, just call it TrackerData
+	for consistency, although it's not the best name... The data manager
+	will keep one of these around to perform updates on the database.
+
+	libtracker-data: Make TrackerDBManager a non-singleton
+	It's turned into a singleton pointer in tracker-data-manager.c atm,
+	but now multiple DB managers pointing to different locations are
+	possible.
+
+	tracker-miner-fs: Adopt DBManager API to manipulate stamp files
+	Those just matter for indexing purposes, so move all management here.
+	tracker-extract has just been made to equate SCHED_IDLE_FIRST_INDEX to
+	SCHED_ALWAYS.
+
+	libtracker-data: Use flags for ro/use_mutex in TrackerDBInterface
+	Caller is now responsible of setting the USE_MUTEX flag, instead of
+	having the interface poke the DB manager.
+
+	libtracker-data: Turn tracker ontologies into an object
+	And make it a singleton in tracker-data-manager.c at the moment.
+
+	libtracker-common: Make locale readonly
+	There's no reasonable situation why we should change this from
+	a library. Initialization (and shutdown) was also mostly useless
+	as it would just set the same settings that it just retrieved.
+	It's been turned into a sanity check for the relevant places.
+
+	libtracker-data: Make journal writers non-singletons
+	We keep two separate writers, one for the ontology and another one
+	for regular data. The ontology one is just used during database
+	initialization and is not expected to survive past
+	tracker_data_manager_init(). The second writer will remain in place
+	in order to dump user updates.
+
+	libtracker-data: Move journal deletion code to tracker-db-journal.c
+	And call it directly from the "tracker reset" subcommand, which seems
+	about the only place where this is needed.
+
+	In the future, we should just consider cache/journal directory ours,
+	delete those altogether, and avoid these horrible layering breaks.
+
+	libtracker-data: Use data location directly to tracker_data_backup_*()
+	Instead of figuring it out from the journal filename.
+
+	libtracker-data: Remove another filename argument in TrackerDBJournal
+	Which also makes it use the right data location for it.
+
+	libtracker-data: Make journal reader a non singleton
+	We initialize and shutdown it quite selectively, it can be safely
+	made a temporary object which is later freed.
+
+	libtracker-data: Demote g_message()s to g_info()
+	g_message() is not filtered out by the default glib log handler, and it
+	doesn't make sense that we differ in behavior here. Since this is a
+	library and many new portions are now exposed to clients, just use
+	g_info() for all this logging, which leave stdout clear unless users
+	set G_MESSAGES_DEBUG.
+
+	libtracker-common: Remove libmediaart log handler
+	libmediaart was split from tracker ages ago.
+
+	libtracker-sparql: Do not modify messages verbosity
+	This is a library, G_MESSAGES_DEBUG is just not ours. The TRACKER_VERBOSITY
+	envvar still affects all tracker executables, but users will need to manually
+	set G_MESSAGES_DEBUG if they want to catch tracker debugging from an app linking
+	to it.
+
+	libtracker-bus: Move tracker-store ping call here
+	We just need this if we have a bus-based connection at all.
+
+	libtracker-fts: Remove TRACKER_FTS_STOP_WORDS envvar
+	If we have to keep one for tests, let it be
+	TRACKER_LANGUAGE_STOP_WORDS_DIR, and point to a dummy location
+	in the fts tests.
+
+	libtracker-data: Remove TRACKER_PRAGMAS_FILE envvar
+	Now that we are exposing databases to apps, it doesn't make sense to offer
+	an environment variable that can entirely mangle how tracker behaves for
+	these (Nor IMHO made sense back in the days, either).
+
+	Let's just remove this envvar and pretend it never existed.
+
+	tracker-store: Move handling of TRACKER_DB_ONTOLOGIES_DIR envvar here
+	It does not make sense at the libtracker-data level, still might make some
+	here.
+
+	libtracker-data: Remove filename argument from journal init funcs
+	We already pass a GFile with the location, just use the predefined basename
+	for these.
+
+	libtracker-data: Use filename based on cachedir for ontologies.gvdb
+	Otherwise other database prefixes mess up with the canonical location.
+
+	libtracker-data: Build all journal file locations from the given GFiles
+	This is necessary to make the journals ubiquitous, as otherwise we mangle
+	the canonical database when opening other ones.
+
+	ontologies: Move nepomuk files into separate directory
+
+	libtracker-data: Require location directories in all internals
+	cache/journal/ontology dirs are now mandatory in
+	tracker_data_manager_init(), all the upper layers must know what
+	database and ontology they are using.
+
+	libtracker-data: Handle backups where journal/cache dirs are the same
+	Otherwise the tmp dir would be already created, causing warnings.
+
+	libtracker-sparql: Add tracker_sparql_connection_local_new(_async) methods
+	These calls make private sparql databases available to applications.
+
+	libtracker-direct: Allow creating readwrite databases through direct connection
+	This will allow creating sparql databases that are private to applications. They
+	will be able to get multiple readonly handles, and updates will be handled by
+	a single private thread. Pretty much like tracker-store (and the refactor took
+	heavy inspiration from it), just sans dbus.
+
+	So far, only the current direct connections (i.e. readonly, pointing to
+	~/.cache/tracker) have been replaced.
+
+	libtracker-data: Pass TrackerDBInterface to wal hook
+	So there's at least some context to pull the DBManager from, Otherwise
+	we're down to DBManager singleton lookups, which might not hold true
+	forever.
+
+	libtracker-data: Use GFile for cache/journal arguments
+	Deal with those from tracker_data_manager_init() on as GFiles,
+	those are still required to be local though. This is more for
+	consistency.
+
+	tests: Remove duplicate ontologies in libtracker-data tests
+	Now TrackerDataManager can lookup ontologies in a directory, as opposed
+	to tests_schemas which could point to specific files. Luckily the ontology
+	files were repeated over and over for each test, so it was easy enough to
+	compress the ontologies into one per set of tests.
+
 2017-06-28  Carlos Garnacho  <carlosg@gnome.org>
 
-	Release 1.12.1
+	libtracker-data: Remove test_schemas argument from TrackerDataManager
+	This is superfluous now that we can load ontologies from custom places.
+
+	libtracker-data: Take a GFile for ontology location in the data manager
+	The other tracker_data_manager_init() arguments taking file paths will
+	follow. This fully exposes the ability to load ontologies from resource://
+	locations.
+
+	ontologies: Build dc/xsd/rdf/nrl/nao as GResource
+	Those ontology files are the tracker core, as the database files' structure
+	is modeled around those classes and properties. Include those as a GResource
+	so they're guaranteed to be there, all other ontology files are optional
+	and must be provided on TrackerDataManager initialization.
+
+	The NAO ontology has been split between the official bits (included in the
+	GResource) and the non-official bits (just used by the evolution miner, and
+	moved to 90-tracker)
+
+	libtracker-data: Use GFile throughout the TrackerDataManager ontology bits
+	Use a GFileEnumerator and GFile to load the ontology files. This makes it
+	possible to use other than local paths for these.
+
+	libtracker-data: Make TrackerTurtleReader take GFiles
+	Instead of file paths. This is so we can load ontology files
+	from resource:// uris. All callers have been changed accordingly.
+
+2017-06-28  Philip Van Hoof  <philip@codeminded.be>
+
+	Domain-ontologies: allow more flexibility on locations. Example:
+	/opt/tracker/share# cat tracker/domain-ontologies/test.rule
+
+	[DomainOntology]
+	DataLocation=%HOME%/.cache/test/data
+	CacheLocation=%HOME%/.cache/test/cache
+	OntologyLocation=%SHAREDIR%/tracker/ontologies
+	Domain=test
+	DBusPath=/test
+	OntologyName=test
+
+	Add cache location to db manager and data manager
+
+	Some unique shortcut names
+
+	Allow loading domain ontology from .rule file
+
+	Allow loading domain ontology from .desktop file
+
+	Allow loading domain ontology from .desktop file
+
+	tracker-store: Allow running multiple D-Bus services for domain ontologies
+
+	libtracker-data, tracker-store: domain specific ontologies
+
+	Whitespace fixes
+
+	libtracker-data: tracker-store: Initial infrastructure to support domain specific ontologies
+
+2017-06-28  Carlos Garnacho  <carlosg@gnome.org>
+
+	configure: Bump API version
+
+	autotools: Don't set -Wl,--enable-new-dtags globally
+	Just set it in library LDFLAGS, otherwise introspection may
+	find the installed libraries before the ones being built, which
+	is not the right thing if there are new symbols/types to be looked
+	up.
+
+	libtracker-miner: Look up for the gir in the right place on g-ir-compile
+	I now wonder how it ever succeeded locally...
+
+	autotools: Fix srcdir!=builddir issues
+	The gir should be generated in builddir for real.
+
+	autotools: Build and merge C/Vala girs in libtracker-sparql
+	Following the meson changes, build 2 separate static libs, generate
+	introspection stuff for those, and put them together in
+	src/libtracker-sparql-backend.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=782091
+
+	libtracker-sparql: Drop needless typedef
+	We don't need defining TrackerSparqlBuilder here, and it causes it
+	to get picked up twice in C and Vala girs.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=782091
+
+2017-06-28  Sam Thursfield  <sam@afuera.me.uk>
+
+	Fix missing introspection data for libtracker-sparql (when using Meson)
+	Up til now only the Tracker.SparqlConnection and Tracker.SparqlBuilder
+	resources were introspectable. This is because we only used the
+	introspection output from `valac`, but other bits of libtracker-sparql
+	have since been added that are written in C.
+
+	There seems to be no way to generate a single .gir for a combined C and
+	Vala codebase, so instead I have written a simple `g-ir-merge` script
+	which can combine two different namespaces into a single .gir.
+
+	This is currently tested and working with the Meson build instructions.
+	It would be possible to implement this for the Autotools build
+	instructions as well.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=782091
+
+2017-06-24  Sam Thursfield  <sam.thursfield@codethink.co.uk>
+
+	Fixes to Meson build system
+	First, instead of using add_global_arguments() we now use a variable
+	to set global compiler args. It turns out that add_global_arguments()
+	is broken if you ever want to include your project as a subproject of
+	something else.
+
+	Second, dependencies weren't being specified correctly. These are
+	hopefully now fixed to avoid any more random build failures.
 
 2017-06-23  Carlos Garnacho  <carlosg@gnome.org>
 
@@ -63,9 +2105,129 @@
 
 	https://bugzilla.redhat.com/show_bug.cgi?id=1404285
 
+2017-06-18  Jordi Mas  <jmas@softcatala.org>
+
+	Fix to Catalan translation
+
+	Update Catalan translation
+
+2017-06-08  Sam Thursfield  <sam@afuera.me.uk>
+
+	Remove Maemo/Meego leftovers
+	This removes various code paths that we believe to be unused.
+
+	  * The userguides miner has been removed altogether.
+	  * The application miner no longer parses MeeGo-style .desktop files
+	  * The TRACKER_DISABLE_MEEGOTOUCH_LOCALE environment flag is gone
+	    (it already did nothing)
+	  * Character set detection with libmeegotouch is removed, only enca
+	    or libicu are supported
+	  * Meego-specific flags are gone from .desktop files
+	  * Functional tests have lost their vestigal Scratchbox and Aegis support
+
+	There are 5 ontologies referencing Maemo, 4 of which are largely unused.
+	These have been kept around in case anyone is using them outside
+	Tracker.
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=783555
+
+	Remove IDE files that were accidentally committed
+	This was my fault, just over a year ago in commit b6c1b5cb638051155
+
+	... sorry!
+
+	Remove obsolete references to the --disable-miner commandline flag
+
+2017-06-06  Carlos Garnacho  <carlosg@gnome.org>
+
+	tracker-extract: Fix typo in last commit
+	The decoder is bcmdec, not bmcdec. I managed to mistype it all over the
+	place.
+
+2017-06-04  Carlos Garnacho  <carlosg@gnome.org>
+
+	tracker-extract: Blacklist vaapi/bmcdec gstreamer elements
+	Remove these from the registry after initialization, the vaapi
+	one could just cause undesired output/warnings after seccomp forbid
+	it to do something. The bmcdec element is dumber and would just
+	crash after shmget() despite trying to refuse it politely with an
+	appropriate errno.
+
+	Fixes SIGSYS on shmget() from gstreamer1-plugin-crystalhd if it
+	happens to be installed and a video file is indexed. The blacklisting
+	code has been lifted from totem-video-thumbnailer.
+
 2017-05-28  Марко Костић  <marko.m.kostic@gmail.com>
 
 	Update Serbian translation
+	(cherry picked from commit bdba71e0313b91ca7d5eea275bd1d559527302c8)
+
+2017-05-23  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 1.13.0
+
+	distcheck fixes
+	Hopefully among the last ones!
+
+2017-05-22  Sam Thursfield  <sam@afuera.me.uk>
+
+	Distribute meson.build files in tarballs generated by Autotools
+	This is useful for people who are not building from Git but still want
+	to avoid Autotools.
+
+	See: https://mail.gnome.org/archives/desktop-devel-list/2017-April/msg00091.html
+
+2017-05-22  Sam Thursfield  <ssssam@gmail.com>
+
+	Meson build instructions for Tracker
+	See <http://mesonbuild.com/> for information about Meson.
+
+	Remaining issues:
+
+	  * There's no `make dist` equivalent. We currently produce release
+	    tarballs containing the output files of the Vala compiler. We need
+	    to think through whether we can stop doing that. Shipping the
+	    generated .c files does make the Vala preprocessor useless so
+	    it would be good if we can stop.
+
+	  * The Firefox, Thunderbird, Evolution and Nautilus plugins are not
+	    built
+
+	  * https://github.com/mesonbuild/meson/issues/671 -- means we can't
+	    depend on tracker_common_dep in most places and have to manually
+	    set link_with, include_directories and sources instead.
+
+	  * https://github.com/mesonbuild/meson/issues/1469 -- without this we
+	    have to install generated Vala headers using a script
+
+	  * https://github.com/mesonbuild/meson/issues/1229 -- means adding
+	    the #include guard to libtracker-sparql/tracker-generated-no-checks.h
+	    is a pain
+
+	  * The test suite has some spurious failures.
+
+	Here's a rough speed comparison.
+
+	Meson:
+	        time sh -c 'meson .. --prefix=/opt/tracker-meson -D bash_completion=/opt/tracker-meson/share/bash-completion -Dsystemd_user_services=/opt/tracker-meson/lib/systemd/user -Ddbus_services=/opt/tracker-meson/share/dbus-1/services && ninja-build -j 4 && ninja-build install'
+
+	        real  1m8.194s
+	        user  2m16.962s
+	        sys   0m20.532s
+
+	Autotools:
+	        time sh -c './configure --prefix=/opt/tracker-autotools --with-bash-completion-dir=/opt/tracker-autotools/share/bash-completion --with-session-bus-services-dir=/opt/tracker-autotools/share/dbus-1/services --disable-nautilus-extension && make -j 4 && make install'
+
+	        real  2m37.750s
+	        user  4m37.214s
+	        sys   0m54.806s
+
+	        Plus 30+ seconds of ./autogen.sh first.
+
+	Note that Meson builds may fail if your source tree has generated files
+	from an Autotools build in there. If you see errors about duplicate
+	definitions, first try cleaning your source tree (use `git clean -dfx`,
+	but make sure you commit any work first!!)
 
 2017-05-11  Carlos Garnacho  <carlosg@gnome.org>
 
@@ -74,9 +2236,36 @@
 
 	https://bugzilla.gnome.org/show_bug.cgi?id=782514
 
+2017-05-03  Fabio Tomat  <f.t.public@gmail.com>
+
+	Update Friulian translation
+
+2017-05-03  Sam Thursfield  <sam@afuera.me.uk>
+
+	libtracker-sparql: Fix further introspection mistakes
+	The gir-scanner doesn't actually run for these files at the moment
+	(see bug#782091) which is why the mistakes didn't get caught until now.
+
+2017-04-16  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-miner: Shuffle refcount handling when queueing back a file
+	The file might or might not be inserted to the queue, which meant that
+	the extra ref created outside the call might never dropped if the file
+	didn't end up inserted again. Fix this by doing the refcount increase
+	when actually inserting the file back in the queue.
+
+	Reported by Jose M. Arroyo <jose.m.arroyo.se@gmail.com>.
+
+2017-04-12  Sam Thursfield  <sam@afuera.me.uk>
+
+	libtracker-sparql: Fix introspection mistakes
+	The gir-scanner doesn't actually run for these files at the moment, so
+	the mistakes didn't get caught until now.
+
 2017-04-07  Stas Solovey  <whats_up@tut.by>
 
 	Update Russian translation
+	(cherry picked from commit 267eec992f033b9e7c71a2ab6370828a8c9afe4c)
 
 2017-04-06  Carlos Garnacho  <carlosg@gnome.org>
 
@@ -85,9 +2274,24 @@
 
 	https://bugzilla.gnome.org/show_bug.cgi?id=780968
 
+2017-03-30  Sam Thursfield  <sam@afuera.me.uk>
+
+	Remove unused Vala dep
+
+	Fix another printf format for gsize, it varies between 32/64 bit
+
 2017-03-29  Fabio Tomat  <f.t.public@gmail.com>
 
 	Update Friulian translation
+	(cherry picked from commit 922c213a52859c6ee0a2b9f3f4dee6f5104bfaa7)
+
+2017-03-21  Sam Thursfield  <sam@afuera.me.uk>
+
+	tracker-needle: Fix compile warning
+
+	libtracker-sparql: Use correct printf format specifiers for gint64
+	Sadly the correct format is different on 32bit and 64bit systems so we
+	have to use the unweildy G_GINT64_FORMAT macro.
 
 2017-03-20  Carlos Garnacho  <carlosg@gnome.org>
 

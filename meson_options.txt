@@ -1,0 +1,22 @@
+option('docs', type: 'boolean', value: true,
+       description: 'Enable the documentation')
+option('fts', type: 'boolean', value: true,
+       description: 'Enable the Tracker full-text search feature')
+option('functional_tests', type: 'boolean', value: true,
+       description: 'Enable the Tracker functional test suite')
+option('journal', type: 'boolean', value: true,
+       description: 'Enable database journal backup mechanism')
+
+option('network_manager', type: 'combo', choices: ['auto', 'no', 'yes'], value: 'auto',
+       description: 'Enable connection detection through NetworkManager')
+option('stemmer', type: 'combo', choices: ['auto', 'no', 'yes'], value: 'auto',
+       description: 'Enable stemming words while indexing')
+option('unicode_support', type: 'combo', choices: ['icu', 'unistring', 'auto'], value: 'auto',
+       description: 'Unicode support library to use')
+
+option('bash_completion', type: 'string', value: 'yes',
+       description: 'Directory to install Bash completion files (or "yes" for default directory, "no" to disable installation')
+option('dbus_services', type: 'string', value: '',
+       description: 'Directory to install D-Bus .service files (leave blank to use the value from dbus-1.pc)')
+option('systemd_user_services', type: 'string', value: 'yes',
+       description: 'Directory to install systemd user .service files (or "yes" for default directory, "no" to disable installation)')
