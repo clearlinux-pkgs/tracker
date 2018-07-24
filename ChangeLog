@@ -1,3 +1,773 @@
+2018-07-23  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 2.1.0
+	Supersedes 2.0.5 (to be ignored). The previous release introduced new
+	API to let TrackerResource output JSON-LD, so this warrants a minor
+	version bump as per semantic versioning.
+
+2018-07-22  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 2.0.5
+
+	configure: Various distcheck fixes
+	Hook up properly the test-bus-query-cancellation functional test in
+	autotools, and add missing files to be able to build from tarballs with
+	meson.
+
+2018-07-21  Sam Thursfield  <sam@afuera.me.uk>
+
+	functional-tests: Remove unused code from helpers.py
+	This functionality is alive and well in the tracker-miners.git fork of
+	this code, and has seen lots of fixes. Rather than let this version get
+	out of sync, let's remove it until something actually needs it.
+
+2018-07-21  Carlos Garnacho  <carlosg@gnome.org>
+
+	Merge branch 'wip/carlosg/direct-rewrite'
+
+	tests: Adapt TrackerFileNotifier tests to internal behavioral change
+	Before commit 68381c1dd, ensure_parents() would stop before the indexing
+	root in the assumption that it was already notified upon, that commit made
+	it so those folders are ensured to be notified too.
+
+	This internal behavioral change is normally evened out by TrackerMinerFS,
+	but shows at the tests for the internal TrackerFileNotifier object as
+	there is nothing there to set the IRI for those files.
+
+	libtracker-miner: Coalesce 2 CREATED events
+	It is not even clear this is possible in real life cases, however the
+	standalone tracker-file-notifier tests fall into this (due to IRI not being
+	ever set, still this is an async op). In the case of 2 consecutive CREATED
+	events on the same file, it would be dealt with in TrackerMinerFS as CREATED+
+	UPDATED. This was already harmless, but we can do better and swallow one of
+	such events.
+
+2018-07-20  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-direct: Use specific include
+	This is an internal header, so we don't need pointing to the general
+	tracker-data.h header. Fixes build from scratch on meson as some files
+	pulled from there are unexpectedly in the build directory.
+
+	libtracker-direct: Avoid WAL checkpoint on readonly connections
+	There is no point in doing WAL checkpoints from a readonly connection, so
+	avoid it altogether.
+
+	libtracker-data: Fetch shared connection on failure to create one
+	On stress situations (tests/functional-tests/ipc/test-bus-query-cancellation
+	is known to trigger this) there may be too many opened FDs all around (dbus
+	related, fds passed for resultsets, DB connections, ...) to keep it all
+	together.
+
+	In those cases, we may attempt to create an extra interface to cater for
+	the incoming request, but it will just fail underneath us. In those cases
+	it is preferrable to fetch a connection from the pool and have it shared
+	across threads than tripping into critical warnings and undefined behavior.
+
+2018-07-20  Sam Thursfield  <sam@afuera.me.uk>
+
+	Update meson build system for libtracker-direct changes
+
+	libtracker-direct: Remove unused variables
+
+2018-07-20  Carlos Garnacho  <carlosg@gnome.org>
+
+	tracker-store: Use TrackerDirectConnection underneath
+	Instead of the lower level TrackerDataManager object directly.
+	The only additional thing that tracker-store does is signal
+	emission for writeback and GraphUpdated, the internal
+	TrackerDataManager object is still accessed to implement those
+	features. This makes libtracker-direct the only place where
+	queries/updates are queued, performed and dispatched.
+
+	There's other indirect benefit from this, update queue handling
+	no longer needs to hit the main thread in order to schedule the
+	next update. Besides the very unlikely thread contention situations
+	described in previous commits, this should maximize throughput
+	of the updates queue.
+
+	libtracker-data: Move notify_transaction() down to libtracker-data
+	Now that we don't need upper layers' information to find out the
+	right CommitType, push this call down together with the handling
+	of the insert/delete/rollback callbacks.
+
+	One particularity is that the commit callbacks will now be called
+	from within the update thread, just like all the other callbacks.
+	And this is fine, with all the preparation work from the previous
+	commits.
+
+	tracker-store: Push TrackerData hooks down to Tracker.Store
+	Move this out of the Resources object, which is basically a view
+	of the internal Store object. All event accounting and signaling
+	is now performed by the Store object, to which the Resources
+	DBus object connects to in order to implement GraphUpdated and
+	Writeback signals.
+
+	Only one handler of these events is possible at the moment, would
+	be nice to consider doing something marginally better on the
+	Steroids interface at some point, at least wrt the amount of data
+	sent through the bus.
+
+	Instead of trying to schedule the timeout across threads (the
+	TrackerData hooks run in the thread performing the updates, and
+	we want signaling done from the main/dbus thread), the code now
+	just sets up a timeout on the main thread that keeps running as
+	long as there are pending updates. When the task for the last
+	batched update returns, it will be safe for the timeout to do
+	signaling one last time and turn itself down, all of this happening
+	in the main thread.
+
+	tracker-store: Protect ready writeback events with mutex
+	Just like with ready GraphUpdated events, this will be potentially accessed
+	by both the thread performing updates, and the thread doing the DBus
+	dispatching and signaling.
+
+	Just like there, the chances of contention are rather low, since emission
+	is checked just once per second by default.
+
+	tracker-store: Refactor writeback signal emission into separate function
+	Purely cosmetic.
+
+	tracker-store: Give ownership of writeback events on get_ready()
+	Instead of doing get_ready() and then reset_ready(), just give
+	ownership of the events hashtable on get_ready() while resetting
+	the internal one.
+
+	tracker-store: Protect event batches with a mutex
+	While the pending data and event counter are only accessed by
+	the updates thread, the ready events will be potentially accessed
+	by both the updates and the dbus thread.
+
+	That said, chances of locking will be minimal, since the
+	get_pending() call only happens once a second (by default) or after
+	the pending buffer grew big enough.
+
+	tracker-store: Do immediate GraphUpdated emission checks on commit hook
+	Triggering those on insert/delete callbacks isn't right for two reasons:
+	there could still be a rollback of the just notified data, and it's done
+	from the wrong thread (the one performing updates instead of the main
+	thread).
+
+	To fix the first, only call this from the commit hook, we can only notify
+	of data that was successfully stored. To fix the second, do the call on
+	an idle that will ensure the main thread running the main loop and doing
+	the DBus dispatching is the one handling the actual emission. At the
+	moment the commit hook is actually executed on that same thread, but that
+	won't stay as-is.
+
+	libtracker-data: Move TrackerClass event maintenance to tracker-store
+	This is solely used by tracker-store to keep the backlog of pending
+	GraphUpdated events. This event tracking can move to tracker-store
+	itself, implemented atop libtracker-data's insert/delete/commit/rollback
+	callbacks.
+
+	libtracker-data: Drop CommitType
+	This basically exists to allow deferring GraphUpdated signals
+	while there's pending batch updates. This is arguably wrong,
+	the priorities should totally affect the order in which updates
+	are processed, but for the sake of interactivity once the data
+	is in the database it makes sense to let the users know ASAP.
+
+	Now all commits shall set up a timer for GraphUpdated emission
+	is none is set yet.
+
+	libtracker-direct: Add sync() call
+	This will flush all updates and trigger the WAL hook.
+
+	libtracker-direct: Add internal function to set additional DBManager flags
+	This will be useful for tracker-store, and the flags that make sense there
+	don't make as much sense to add to the public TrackerSparqlConnectionFlags
+	set.
+
+	libtracker-data: Remove TRACKER_DB_MANAGER_REMOVE_CACHE flag
+	It's unused and unhandled. As the TrackerDBManager type is internal
+	API, just remove the flag and shuffle the numbers.
+
+	tracker-store: Do not freeze events during TTL load
+
+	libtracker-direct: Add internal TrackerDataManager getter
+	This will make internal users able to access all the gory details
+	that TrackerDataManager has to offer. Will help deduplicate code
+	in tracker-store that is essentially the same than this.
+
+	libtracker-direct: Rewrite in C
+	In today's chapter of gratuituous rewrites. The instigator of this
+	rewrite is vala's bug https://bugzilla.gnome.org/show_bug.cgi?id=789249.
+	One might argue that bugs are bugs and eventually get fixed, but there's
+	two things that make me think it won't happen soon:
+	- Vala behavior of possibly iterating the main loop from the async task
+	  until the task is complete is very much deliberate in order to support
+	  the Generator pattern without a main loop, as seen at:
+	  https://wiki.gnome.org/Projects/Vala/AsyncSamples#Generator_example
+	- OTOH, glib docs specify that a GAsyncReadyCallback must happen at a
+	  later iteration of the main context, presumably to ensure the task
+	  is not finished before the async function dispatching the task returns.
+	  This is precisely what trips Vala into starting the same task again.
+
+	I don't see either changing anytime soon, and in the mean time Tracker
+	is largely affected by it, both in perceived bugs (All those nie:url
+	constraint warnings out of the blue had a reason, this) and in real bugs
+	(It's sometimes attempting to insert things twice, and it may even succeed
+	if the query does not break any cardinality/unique constraints). This
+	affects Tracker in too fundamental ways to just shrug it away, unlike the
+	Vala code this C/glib code works just as it looks.
+
+	Now about the code... It's a pretty boring rewrite, there's a thread pool
+	to dispatch select queries, and a single exclusive thread to handle updates.
+	The WAL hook can possibly use an additional thread to perform non-blocking
+	writes. All very much alike the older code.
+
+	Future commits will make tracker-store use this connection implementation,
+	so there's only this piece of code handling SPARQL updates.
+
+2018-07-20  Sam Thursfield  <sam@afuera.me.uk>
+
+	Merge branch 'sam/notifier-race-fix'
+	See https://gitlab.gnome.org/GNOME/tracker/merge_requests/9
+
+	libtracker-miner: Fix race which resulted in files being queued out of order
+	The TrackerFileNotifier signals need to be emitted in a heirarchical
+	order. If we have this directory heirarchy...
+
+	    test-monitored/
+	    test-monitored/file1.txt
+
+	...we must always emit ::file-created for 'test-monitored/' before we emit
+	::file-created for 'test-monitored/file1.txt'.
+
+	The tracker_file_notifier_ensure_parents() function ensures that we do
+	this, but it would previously not work correctly in situations where
+	'test-monitored/' was a configured indexing root, rather than a
+	subdirectory of one of the roots.
+
+	This was causing the tracker-miners functional tests to randomly fail
+	with errors such as this:
+
+	    ** (tracker-miner-fs:18181): WARNING **: 16:01:00.461: Parent 'file:///home/sam/tracker-tests/tmpDSmsQI/test-monitored' not indexed yet
+
+	This is presumably a regression from 2e2dd4f5dc650aefa4b7188cf1a612b2d27f84ba.
+
+2018-07-19  Milo Casagrande  <milo@ubuntu.com>
+
+	Update Italian translation
+
+2018-07-18  Anders Jonsson  <anders.jonsson@norsjovallen.se>
+
+	Update Swedish translation
+
+2018-07-17  Sam Thursfield  <sam@afuera.me.uk>
+
+	meson: Consolite vars used for running tracker-store uninstalled
+	Most importantly, these are consumed in the tracker-miners.git project
+	so that it can run when built with tracker core as a Meson subproject.
+	This should theoretically allow building tracker-miners on systems that
+	don't have tracker installed at all, although I think some problems
+	remain with doing that.
+
+	Note that meson.source_root() must never be used in variables that
+	are consumed by a subproject, because in that situation they expand to
+	the root of the *toplevel project* and not the current subproject.
+
+2018-07-16  Florian Heiser  <gnu.l10n.de@gmail.com>
+
+	Update German translation
+
+2018-07-16  Bruno Lopes da Silva  <brunolopesbldsb@gmail.com>
+
+	Update Brazilian Portuguese translation
+
+2018-07-16  Sam Thursfield  <sam@afuera.me.uk>
+
+	Merge branch 'sam/functional-tests'
+	See https://gitlab.gnome.org/GNOME/tracker/merge_requests/7
+
+	Honour TRACKER_DB_ONTOLOGIES_DIR override more logically
+	Previously, we would ignore this environment variable unless the
+	installed directory didn't exist. This meant that one of the
+	functional tests would stop working once you ran `make install`...
+
+	functional-tests: Autotools now runs functional tests against source tree
+	This is how Meson already behaves.
+
+	functional-tests/09-concurrent-query.py: Print error on failure
+	Previously you would get this error on failure:
+
+	    Traceback (most recent call last):
+	      File "/usr/lib64/python2.7/site-packages/gi/overrides/Gio.py", line 158, in __async_result_handler
+	        error_callback(obj, e, real_user_data)
+	    TypeError: error_handler() takes exactly 1 argument (4 given)
+
+	tests: Turn gb-737023 test into a functional-test
+	This is really testing the IPC methods, so it should go with the other
+	IPC tests which talk to a real tracker-store instance.
+
+	Now the test is isolated from the user's real data, as it runs through
+	the functional test-runner.sh script. It does still use the
+	tracker-store from the system rather than the one we just built though,
+	more work is needed there.
+
+	The test sometimes fails due to the tracker-store disconnecting from it
+	and GDBus triggering a SIGTERM due to the exit-on-close option being
+	enabled on the GDBusConnection. I'm not sure how to fix that, there
+	is an open bug here: https://gitlab.gnome.org/GNOME/tracker/issues/18
+
+	functional-tests/200-backup-restore.py: Delete this test
+	The backup API appears to be totally broken. There aren't any good use
+	cases for this, it's a legacy from the Maemo days. The plan is to
+	deprecate and remove it, so let's start by deleting the test.
+
+	functional-tests/17-ontology-changes.py: Disable most tests
+	This removes the TrackerSystemAbstraction class (or rather merges it
+	into 17-ontology-changes.py, which was the only real user in this repo).
+
+	Something seems very broken about the ontology updates code in Tracker;
+	most of the tests are failing even though they should not.
+
+	We aren't doing many ontology changes so this is not the highest
+	priority issue right now.
+
+	I have tidied up the code quite a lot for the testcase, more work is
+	needed to make things actually simple to debug. I'd recommend using
+	tracker_sparql_connection_new_local() instead of starting a new
+	external store process so that the problems can be more easily
+	debugged.
+
+	functional-tests: Mark test which is known to be unsupported
+
+	functional-tests/13-threaded-store.py: Disable failing test
+	This test causes a parser stack overflow. Carlos is nearly done on a
+	branch which rewrites the parser so there probably isn't much point
+	tracking down this issue in the old code.
+
+	functional-tests/13-threaded-store.py: Remove obsolete import
+
+	functional-tests/03-fts-functions.py: Skip failing test, for now.
+	I don't know what's wrong with this, and I want to prioritize having
+	the functional tests run on every commit rather than fixing every
+	small issue with them.
+
+	functional-tests: Disable sqlite-misused tests as they are super slow
+
+	functional-tests: Disable IPC tests that don't work
+	It's not clear what these are for.
+
+	functional-tests: Avoid crash when TRACKER_TESTS_VERBOSE is set
+
+	functional-tests: Add missing environment variable
+	This fixes tests that were trying to load the generated .ttl files.
+
+	ci: Enable functional tests
+	PyGI is now needed as an extra dependency. Note that the
+	functional tests still use Python 2
+
+	ci: Avoid dumping screenfuls of CI_ variables for each failed test
+
+	ci: Fix job names to be consistent
+
+	Merge branch 'sam/ci-custom-base-image'
+	See https://gitlab.gnome.org/GNOME/tracker/merge_requests/8
+
+	ci: Use a custom base image with packages we need preinstalled
+	The images are built from this project:
+	https://gitlab.gnome.org/samthursfield/tracker-oci-images
+
+2018-07-15  Piotr Drąg  <piotrdrag@gmail.com>
+
+	Update Polish translation
+
+	Restore Unicode quotation marks in a translatable string
+	Fixes regression in commit b458fda8fa03f5ec53f8de9edfeef1b7610aae9c.
+
+	See https://developer.gnome.org/hig/stable/typography.html
+
+2018-07-15  Sam Thursfield  <sam@afuera.me.uk>
+
+	Merge branch 'sam/resource-jsonld'
+	See https://gitlab.gnome.org/GNOME/tracker/merge_requests/3
+
+	Add support to TrackerResource for outputting metadata as JSON-LD
+	This also adds `tracker extract -o json` to dump resources in JSON-LD,
+	in anticipation of corresponding updates in tracker-miners.git.
+
+	Bump version number
+	This allows tracker-miners to check that it's being built against a
+	version of tracker that provides necessary new API.
+
+	Merge branch 'sam/tracker-miner-fs-test-fixes'
+	See https://gitlab.gnome.org/GNOME/tracker/issues/15
+
+	libtracker-miner: Warn when overwriting tasks in the task pool
+	The TrackerTaskPool class and its subclass TrackerSparqlBuffer are
+	designed to contain only one task for any given GFile.
+
+	If multiple tasks are pushed for the same file some of them might
+	not be executed. This leads to issues such as:
+	https://gitlab.gnome.org/GNOME/tracker/issues/15
+
+	libtracker-miner/tracker-miner-fs.c: Fix "Parent not indexed yet" errors
+	Commit cef502e668a640 ("Add TrackerMinerFS::move-file vmethod")
+	introduced a regression which sometimes led to errors like this:
+
+	    Tracker-FATAL-WARNING: Parent 'file:///tmp/tracker-miner-fs-test-77E2LZ/recursive/4' not indexed yet
+
+	This was causing tracker-miner-fs-test to fail in some cases.
+
+	TrackerTaskPool assumes that there is only one task in the pool per
+	GFile. When processing item_move() operations this wasn't true because
+	we'd create one task for removing the existing dest_file, and another
+	task for updating the URL of source_file to point to dest_file. Both
+	tasks would be associated with dest_file.
+
+	If the SPARQL buffer was flushed after the first task was created and
+	before the second task was created, the second task would overwrite
+	the first task in the ->priv->tasks hash table, so when the first
+	task completed, the second task would be removed from the task pool
+	without ever executing.
+
+	This would mean that the URL of source_file never got updated to
+	point at dest_file, which triggered the "Parent not indexed yet" error
+	later on.
+
+	libtracker-miner/tracker-miner-fs.c: Rename item_move() parameter
+
+	tests: Enable two more test cases in tracker-miner-fs-test
+	Two of the test functions weren't being called, and two other test
+	functions were being called twice. Oops.
+
+	Merge branch 'sam/meson-test-fixes'
+	See https://gitlab.gnome.org/GNOME/tracker/merge_requests/5
+
+	meson: Rework how unit tests are defined
+	Today I discovered that three testcases were being ignored in the Meson
+	buildsystem, all due to mistakes.
+
+	Now, the first thing in each meson.build file is the list of testcases
+	so mistakes should be much easier to spot.
+
+	meson: Enable gb-737023 test
+
+	meson: Enable tracker-file-enumerator-test
+	This was accidentally not being run.
+
+	meson: Enable tracker-miner-fs-test
+	This was accidentally not being run.
+
+	tests/libtracker-miner: Fix warnings in tracker-file-enumerator-test.c
+	These are all just about unused variables.
+
+	tests: Fix inconsistent test filenames
+
+	ci: Second attempt to fix Autotools CI
+	Commit 61d9f5085122a12b269c49089133511c17140976 was supposed to make
+	the tests run under `dbus-launch` again, but I messed this up.
+
+2018-07-13  Sam Thursfield  <sam@afuera.me.uk>
+
+	ci: Fix regression from previous commit
+	The TESTS_ENVIRONMENT variable seemed to work OK locally, and it's documented
+	in the Autotools manual, but clearly something went wrong so let's go back to
+	running dbus-launch explicitly.
+
+	ci: Show logs for failed tests
+	I have been seeing test-tracker-miner-fs fail without any explanation, which is
+	impossible to debug unless the logs are displayed afterwards.
+
+2018-07-11  Sam Thursfield  <sam@afuera.me.uk>
+
+	tests: Fix warnings in testcase
+	These were introduced in 562cdfc64c25e2d76745beb5fca28ea89f9b33ed.
+
+	tests: Fix warnings in tracker-miner-fs-test
+
+	Merge branch 'sam/ci'
+	See https://gitlab.gnome.org/GNOME/tracker/merge_requests/4
+
+	Enable GitLab CI
+	This tests that Tracker can be built from source using Autotools and
+	Meson, and that all of the unit tests run successfully.
+
+	There are various improvements that could be made:
+
+	  * Pre-create a Docker image with the build dependencies installed, so
+	    that we don't wait for `dnf` on every build.
+	  * Fix the functional tests and enable them for every build.
+	  * Fix the unit tests to not depend on Tracker being installed in the
+	    host
+	  * Remove the Autotools build system altogether and use Meson for
+	    everything \o/
+
+2018-07-02  Sam Thursfield  <sam@afuera.me.uk>
+
+	libtracker-miners-common: Improve error when domain rule isn't found
+	Before:
+
+	    GLib-CRITICAL **: g_key_file_load_from_file: assertion 'file != NULL' failed
+
+	    CRITICAL **: Could not load domain ontology '(null)': Key file does not have group “DomainOntology”
+
+	After:
+
+	    ERROR **: Unable to find default domain ontology rule /usr/local/share/tracker/domain-ontologies/default.rule
+
+	functional-tests: Show stderr output when a subprocess fails
+	Previously it was necessary to set TRACKER_TESTS_VERBOSE in the
+	environment in order to see this output, but there's pretty much
+	never a situation where you don't want to see stderr when an error
+	occurs.
+
+	functional-tests: Return correct (non-zero) exit code if subprocess crashes
+
+	meson: Add soversion information to the shared libraries that we install
+	This is needed so that Libtool will link against them correctly.
+
+	tests: Fix tracker-steroids test
+	Since commit ee7b32875388f612f7d227 (from May 2016) this test has been
+	inserting some data, deleting it right away, and then trying to use the
+	data in all its tests. Mysteriously this seems to have been working absolutely
+	fine for two years, and I have only hit a problem when running the tests in a
+	minimal Fedora 27 Docker environment. The same tests work fine on a Fedora 27
+	desktop environment.
+
+	I have fixed the tests to use a fixture which is what they should have been
+	doing all along.
+
+	meson: Expose tracker-store as a variable
+	This allows projects that embed tracker as a subproject to access the
+	variable.
+
+2018-06-30  Sam Thursfield  <sam@afuera.me.uk>
+
+	meson: Fix bundled FTS module
+	The sqlite3_fts5_init() symbol was being discarded as nothing linked
+	against it (it's loaded dynamically at runtime instead).
+
+	Using link_whole instead of link_with fixes that.
+
+	meson: Fix detection of SQLite3 FTS module
+	Instead of running the test, we were only compiling it and thus
+	discovering nothing of interest.
+
+	The error messages are now clearer too.
+
+	meson: Fix name of libtracker-fts
+	The 'lib' prefix isn't necessary in the library() target name.
+
+2018-06-25  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 2.0.4
+
+2018-06-24  Carlos Garnacho  <carlosg@gnome.org>
+
+	tests: Set stop-words envvar on TrackerFileNotifier test
+	This is necessary for it to run entirely uninstalled, as it ends
+	up using TrackerSparqlConnection for queries and updates.
+
+2018-06-23  Carlos Garnacho  <carlosg@gnome.org>
+
+	tests: Fix some path lookups
+	Those should be looked up from the root source dir, not the current
+	one.
+
+	docs: Fix broken XIncludes in libtracker-sparql docs
+	Add missing example files to content, and generate ontology
+	docs for the builtin ontology bits.
+
+	libtracker-miner: Emit ::file-updated on file extension changes
+	We have no access to past/current GFileInfos, so detect changes in
+	file extensions to handle the cases where a change of filename
+	results in the file having a different mimetype.
+
+	In these cases, ::file-updated should be emitted, so it gets the
+	right rdf:types as per its new mimetype.
+
+	libtracker-miner: Transfer attribute updates information through the event
+	First, seems cleaner to do it this way, as GObject data has undefined
+	lifetime (yes, as long as the object lives, but the TrackerFileSystem may
+	cache those).
+
+	But this also fixes an unintended side effect that "attribute only" updates
+	take precedence over full updates, events themselves may be coalesced away,
+	but data would remain. Actually it's the other way around, if we get a full
+	update and an attributes-only update, we may discard the second.
+
+	libtracker-miner: Emit TrackerDecorator::finished on 0 items
+	If no items are found, ::finished is silenced away. Better to do
+	this for consistency.
+
+2018-06-21  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-miner: Ignore root folder when crawling at places
+	There's 2 situations where they may be avoided:
+	1) When crawling a new folder after it's been detected through
+	   TrackerMonitor, as ::file-created is emitted right away since
+	   commit 09408f1dcad.
+	2) When a directory is moved, as ::file-moved will be emitted
+	   for it in advance.
+
+	In these situations it's wrong/undesirable to maybe emit
+	::file-created/-updated for those.
+
+	libtracker-common: Drop automatic parser versioning
+	The TRACKER_PARSER_VERSION number must be bumped on every change
+	to src/libtracker-common/tracker-parser*. This policy shall be
+	enforced through a server-side update hook.
+
+	This is a bit more cumbersome for the OTOH sparse changes to the
+	parser, but friendlier to the meson build system, where we can't
+	have build-generated files added to dist.
+
+2018-06-17  Sam Thursfield  <sam@afuera.me.uk>
+
+	Merge branch 'sqlite-dep' into 'master'
+	build: Bump sqlite3 dependency
+
+	See merge request GNOME/tracker!2
+
+2018-06-16  Sam Thursfield  <sam@afuera.me.uk>
+
+	Merge branch 'wip/piotrdrag/missing-space' into 'master'
+	Add missing space in tracker info output
+
+	See merge request GNOME/tracker!1
+
+2018-06-10  Ernestas Kulik  <ernestask@gnome.org>
+
+	build: Bump sqlite3 dependency
+	SQLITE_DETERMINISTIC was introduced in 3.8.3.
+
+2018-06-04  Piotr Drąg  <piotrdrag@gmail.com>
+
+	Add missing space in tracker info output
+	https://bugzilla.gnome.org/show_bug.cgi?id=794496
+
+2018-06-01  Sam Thursfield  <sam@afuera.me.uk>
+
+	meson: Remove duplicated line
+	This triggered a warning with meson 0.46 and will be treated as an error
+	by future versions.
+
+2018-05-30  Rico Tzschichholz  <ricotz@ubuntu.com>
+
+	libtracker-sparql: Use replacement for IOSchedulerJob.push() which is still deprecated
+
+2018-05-19  Sam Thursfield  <sam@afuera.me.uk>
+
+	cli: Fix invalid SPARQL generated by `tracker tag --list`
+	This was causing the command to fail.
+
+2018-05-16  Rico Tzschichholz  <ricotz@ubuntu.com>
+
+	libtracker-data: DBInterface.create_statement() may not be abstract in vala
+	https://bugzilla.gnome.org/show_bug.cgi?id=796104
+
+2018-04-22  Sam Thursfield  <sam@afuera.me.uk>
+
+	meson: Install generated headers without needing a script
+	This script dates from a long time ago when Meson lacked ways to install
+	generated headers.
+
+	This fixes an issue where `ninja install` in tracker.git triggers a
+	rebuild of lots of stuff from tracker-miners.git, which happened because
+	the mtime of the installed generated headers would become newer than the
+	build files in tracker-miners.git and cause ninja to rebuild them all.
+
+2018-04-20  Sam Thursfield  <sam@afuera.me.uk>
+
+	libtracker-sparql: Fix wording of function documentation
+
+	meson: Use relative paths for gtk-doc src_dir arguments
+	Using absolute paths breaks if we are embedded as a subproject because
+	the toplevel path is that of the toplevel project.
+
+2018-03-28  Andika Triwidada  <atriwidada@gnome.org>
+
+	Update Indonesian translation
+
+	Update Indonesian translation
+
+2018-03-26  Piotr Drąg  <piotrdrag@gmail.com>
+
+	tracker-store: Remove empty Icon= from the .desktop file
+	It’s going to be confusing gettext when we port Tracker away from intltool.
+
+2018-03-26  Rafael Fontenelle  <rafaelff@gnome.org>
+
+	Update Brazilian Portuguese translation
+
+2018-03-26  Piotr Drąg  <piotrdrag@gmail.com>
+
+	Revert "Removed unneeded [] markers in POTFILES.in with gettext extraction method"
+	This reverts commit 75ed66c3c0d88c15974afd7805bc4cedf6ce21b4.
+
+	Tracker has not been migrated to gettext yet.
+
+2018-03-26  Andika Triwidada  <atriwidada@gnome.org>
+
+	Update Indonesian translation
+
+2018-03-26  Claude Paroz  <claude@2xlibre.net>
+
+	Removed unneeded [] markers in POTFILES.in with gettext extraction method
+	This was forgotten during the intltool to gettext migration.
+
+2018-03-26  Tong Hui  <tonghuix@gnome.org>
+
+	Update Chinese (China) translation
+
+2018-03-20  gogo  <trebelnik2@gmail.com>
+
+	Update Croatian translation
+
+	Add Croatian translation
+
+2018-03-13  Stas Solovey  <whats_up@tut.by>
+
+	Update Russian translation
+
+2018-03-10  Bruce Cowan  <bruce@bcowan.eu>
+
+	Update British English translation
+
+2018-03-06  Efstathios Iosifidis  <eiosifidis@gnome.org>
+
+	Update Greek translation
+
+2018-02-13  Simental Magana, Marcos  <marcos.simental.magana@intel.com>
+
+	libtracker-data: fix compile issue when using --disable-fts
+	previous commit (66a6dc) refactors code, but some lines missed the
+	refactor. This commit fixes the oversight of those lines.
+
+
+	https://bugzilla.gnome.org/show_bug.cgi?id=793282
+
+2018-02-13  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-data: Perform VACUUM only on large database files
+	The agressive VACUUM on shutdown is the cause for the reported slowness
+	in tracker-store restarts. Let's be a bit more conservative, and only
+	trigger VACUUMing when the database file gets hideously large (4GB).
+
+	There is the remote possibility that a database is still larger than
+	4GB after VACUUM. I'll just make it suck at the moment and do the same
+	frequent VACUUMs we get currently.
+
+	libtracker-miner: Emit monitor ::file-created for directories immediately
+	On monitor events on directories we used to trigger a full crawling, and
+	only notified the directory during recursive handling. However other monitor
+	events may happen immediately on the child, which would get queued
+	immediately before the parent folder (which is being idly crawled).
+
+	Emit ::file-created immediately here in order to ensure correct ordering
+	in the TrackerMinerFS queue. If notifier_queue_root() ends up notifying
+	about the file again, the event would get eventually discarded or simply
+	handled as an update.
+
+2018-02-07  Debarshi Ray  <debarshir@gnome.org>
+
+	libtracker-miner: Don't leak TrackerMinerFS:root
+	https://bugzilla.gnome.org/show_bug.cgi?id=793061
+
 2018-02-07  Carlos Garnacho  <carlosg@gnome.org>
 
 	Release 2.0.3

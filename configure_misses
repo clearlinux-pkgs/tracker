@@ -2,4 +2,3 @@ Configure miss: WIN32
 Configure miss: sb_stemmer_new in -lstemmer
 Configure miss: UPOWER
 Configure miss: up_client_get_on_low_battery
-Configure miss: LIBICU

@@ -93,6 +93,7 @@ libtracker-miner-2.0.so.0:tracker_miner_stop
 libtracker-miner-2.0.so.0:tracker_network_type_get_type
 libtracker-sparql-2.0.so.0:tracker_namespace_manager_add_prefix
 libtracker-sparql-2.0.so.0:tracker_namespace_manager_expand_uri
+libtracker-sparql-2.0.so.0:tracker_namespace_manager_foreach
 libtracker-sparql-2.0.so.0:tracker_namespace_manager_get_default
 libtracker-sparql-2.0.so.0:tracker_namespace_manager_get_type
 libtracker-sparql-2.0.so.0:tracker_namespace_manager_has_prefix
@@ -130,6 +131,7 @@ libtracker-sparql-2.0.so.0:tracker_resource_get_type
 libtracker-sparql-2.0.so.0:tracker_resource_get_values
 libtracker-sparql-2.0.so.0:tracker_resource_identifier_compare_func
 libtracker-sparql-2.0.so.0:tracker_resource_new
+libtracker-sparql-2.0.so.0:tracker_resource_print_jsonld
 libtracker-sparql-2.0.so.0:tracker_resource_print_sparql_update
 libtracker-sparql-2.0.so.0:tracker_resource_print_turtle
 libtracker-sparql-2.0.so.0:tracker_resource_set_boolean
