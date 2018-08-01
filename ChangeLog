@@ -1,3 +1,52 @@
+2018-08-01  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 2.1.1
+
+	tests: Set limit on test-bus-query-cancellation
+	This test tries to do a pretty dumb DOS on tracker-store for 2s,
+	so it frequently gets kicked itself from the session bus. Presumably
+	we don't need it to go that far in testing query cancellation, so
+	limit the thing to a bunch of queries.
+
+	libtracker-direct: Plug namespaces HT leak
+
+	libtracker-direct: Plug leak
+	Fixes: #11
+
+2018-07-27  Aurimas Černius  <aurisc4@gmail.com>
+
+	Updated Lithuanian translation
+
+2018-07-26  Carlos Garnacho  <carlosg@gnome.org>
+
+	Merge branch 'wip/carlosg/fix-bijiben-flatpak'
+
+	libtracker-sparql-backend: Catch all errors on direct connection
+	We just used to catch Tracker.Error, so all other errors would
+	end up propagated upwards.
+
+	libtracker-direct: Clear data manager on failure
+	Otherwise we try to do stuff with it on finalize() that counts on
+	it being initialized.
+
+	libtracker-direct: Avoid setting WAL hook on readonly connections
+	This is useless as the "writable" interface is 1) still readonly,
+	2) unused, and 3) No updates shall ever happen on it, so no need for
+	the WAL hook.
+
+	libtracker-data: Remove wrong check
+	Underneath the branch we check for the DB manager being created
+	as readonly or not. We are not erroring out properly with this
+	check here.
+
+2018-07-23  Daniel Șerbănescu  <daniel@serbanescu.dk>
+
+	Update Romanian translation
+
+2018-07-23  Daniel Mustieles  <daniel.mustieles.contractor@bbva.com>
+
+	Updated Spanish translation
+
 2018-07-23  Carlos Garnacho  <carlosg@gnome.org>
 
 	Release 2.1.0
