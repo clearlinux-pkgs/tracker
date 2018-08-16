@@ -1,3 +1,105 @@
+2018-08-16  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 2.1.2
+
+	tests: Ignore previous monitor events from test setup
+	This specific TrackerMonitor test sometimes fails on an unexpected
+	sequence of monitor events. Give it time to handle all events after
+	the test is set up, those are not the purpose of the test, and handling
+	all them in one go sometimes results on another series of roughly
+	equivalent events.
+
+	Closes: #20
+
+2018-08-15  Carlos Garnacho  <carlosg@gnome.org>
+
+	Merge branch 'sam/meson-substitution-fix'
+
+	Merge branch 'sam/namespace-c++'
+
+2018-08-15  Sam Thursfield  <sam@afuera.me.uk>
+
+	libtracker-sparql: Don't use 'namespace' as a parameter name
+	This header was unusable from C++ code as 'namespace' is a reserved
+	keyword there.
+
+	Based on a patch by Santtu Lakkala from
+	https://bugzilla.gnome.org/show_bug.cgi?id=791510
+
+2018-08-15  Marek Cernocky  <marek_cernocky@conel.cz>
+
+	Updated Czech translation
+
+2018-08-15  Balázs Meskó  <meskobalazs@fedoraproject.org>
+
+	Update Hungarian translation
+
+2018-08-14  Efstathios Iosifidis  <eiosifidis@gnome.org>
+
+	Update Greek translation
+
+2018-08-12  Emin Tufan Çetin  <etcetin@gmail.com>
+
+	Update Turkish translation
+
+2018-08-12  Yi-Jyun Pan  <pan93412@gmail.com>
+
+	Update Chinese (Taiwan) translation
+
+2018-08-12  Sam Thursfield  <sam@afuera.me.uk>
+
+	meson: Substitute @libexecdir@ in D-Bus service file correctly
+	We were doing an unnecessary intltool-merge step for the file
+	org.freedesktop.Tracker1.service while failing to do the necessary
+	configuration substitution. Oops.
+
+2018-08-10  Sam Thursfield  <sam@afuera.me.uk>
+
+	Merge remote-tracking branch 'origin/wip/lantw/dont-hard-code-usr-bin-python2'
+	See: https://gitlab.gnome.org/GNOME/tracker/merge_requests/13
+
+2018-08-10  Ting-Wei Lan  <lantw@src.gnome.org>
+
+	utils: Don't hard-code the path to python
+	It causes tracker to fail to build on FreeBSD because python is usually
+	installed in a different prefix, such as /usr/local, on FreeBSD.
+
+2018-08-09  Charles Monzat  <charles.monzat@numericable.fr>
+
+	Update French translation
+
+2018-08-08  Fabio Tomat  <f.t.public@gmail.com>
+
+	Update Friulian translation
+
+2018-08-03  Sam Thursfield  <sam@afuera.me.uk>
+
+	Merge branch 'wip/carlosg/resource-deletes'
+	See https://gitlab.gnome.org/GNOME/tracker/merge_requests/12
+
+2018-08-03  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-sparql: delete TrackerResource elements one by one
+	Creating a single query for all values to delete can only work if
+	all values have a match. As soon as a value is already missing,
+	the query would just bail out as there's no real match.
+
+	We want to delete every value individually regardless of other
+	properties, so decompose the single delete into multiple individual
+	deletes.
+
+	Fixes "Unable to insert multiple values for subject..." warnings
+	as the insertion queries would rely on single-valued properties being
+	cleared beforehand.
+
+	https://gitlab.gnome.org/GNOME/tracker/issues/28
+
+	Closes: #28
+
+2018-08-03  Matej Urbančič  <mateju@svn.gnome.org>
+
+	Added Slovenian translation
+
 2018-08-01  Carlos Garnacho  <carlosg@gnome.org>
 
 	Release 2.1.1
