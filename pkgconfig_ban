@@ -22,7 +22,6 @@ libnm-glib
 libosinfo-1.0
 meegotouch
 poppler-glib
-taglib_c
 totem-plparser
 upower-glib
 vorbisfile
