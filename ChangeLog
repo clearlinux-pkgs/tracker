@@ -1,3 +1,123 @@
+2018-08-30  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 2.1.3
+
+	Revert "Add tracker_sparql_connection_get/set_dbus_connection()"
+	This reverts commit eb24ea93bc550934d15223d002b490143e604921.
+
+	This is an interesting feature, but not a good timing. Punt for
+	2.2.x that will happen after 3.30.
+
+	Merge branch 'wip/carlosg/insert-delete-triggers'
+
+	libtracker-data: Avoid refcount leaks on ontology updates
+	Make sure we add the new triggers after the "rename table, create
+	replacement one, dump data" dance we do on ontology changes. This will
+	avoid leaks as the last step there would increase refcount for all
+	involved resources.
+
+	There is only one situation where this does not work: Ontology changes
+	that remove properties with rdfs:Resource range will result in those
+	resources being leaked. This breaks differently but in similar ways for
+	single-valued and multivalued properties, in the first we fail to delete
+	elements from the old table, in the second we fail to delete the table
+	altogether.
+
+	This barely ever happens, so a FIXME has been added, we should cross this
+	bridge before doing any such modification in the ontology.
+
+	libtracker-data: Make insert/delete triggers modify all resource properties
+	Refcount is not being increased if inserts happen with other values than
+	the initial one, nor decreased when deletes happen on rows holding
+	references to resources.
+
+	In order to fix this, make the insert/delete triggers check all properties
+	with rdfs:Resource range, this will ensure resources are properly
+	refcounted in those cases.
+
+	Closes: https://gitlab.gnome.org/GNOME/tracker/issues/32
+
+	libtracker-data: Keep internal resources out of refcount checks
+	Whatever it happens, we don't want to break the database that bad.
+
+	libtracker-direct: Fix error fetching for single updates in update_array()
+	The error location was being silently leaked.
+
+	libtracker-direct: Use ';' as separator for multiple update statements
+	Let's stick to SPARQL1.1 correct syntax.
+
+	libtracker-miner: Use ';' as separator for multiple update statements
+	Let's stick to SPARQL1.1 correct syntax.
+
+	libtracker-sparql: Use ';' as separator for multiple update statements
+	The separator being optional is a tracker-specific "feature". Seems better
+	to use proper SPARQL1.1 here.
+
+	libtracker-data: Correct SQL query for ontology checks
+	The column does not exist in that table, should be fetched from the
+	rdfs:Resource table. This results in the query returning the column
+	name as a string (due to the quotes), and turning out as a 0
+	nao:lastModified.
+
+	Those dates are kinda thrown away for readwrite connections, so it
+	didn't matter there. They stick around for readonly connections in
+	the internal TrackerOntologies, but the modification date has no
+	use or purpose on those.
+
+	libtracker-data: Update nao:lastModified after creating new database
+	It used to happen only right after ontology checks, which left branch new
+	databases with an unset ontology modification date. This really didn't have
+	ill effects, on the second run ontologies would be checked, but no real
+	change would happen except the nao:lastModified change.
+
+	Still better to do it at once, instead of waiting for the next run.
+
+	tests: Run sparql blank tests on a temporary folder
+	So it can't fail due to leftovers from previous runs.
+
+	tests: Ignore previous events from monitor test setup
+	Similar to commit ff1f66a4d46. The move..._after_file_update test has
+	the same issue than the move..._after_file_create, so let's forget those
+	first events.
+
+	libtracker-miner: Fix tracker-store DBus name watch
+
+2018-08-29  Fran Dieguez  <frandieguez@gnome.org>
+
+	Update Galician translation
+
+2018-08-29  Sam Thursfield  <sam@afuera.me.uk>
+
+	Merge remote-tracking branch 'origin/wip/carlosg/legalese-cardinality'
+	See https://gitlab.gnome.org/GNOME/tracker/merge_requests/19
+
+2018-08-28  Seong-ho Cho  <shcho@gnome.org>
+
+	Update Korean translation
+
+2018-08-28  Carlos Garnacho  <carlosg@gnome.org>
+
+	ontologies: Drop cardinality from legalese properties
+	nie:copyright and nie:license were single valued and subproperties of the
+	common single valued properties nie:legal and dc:rights. Drop cardinality
+	restrictions on all of those, so we can have multiple values for each.
+
+	This happens to be in line with the last ever version of NIE ontology.
+
+	Closes: https://gitlab.gnome.org/GNOME/tracker/issues/33
+
+2018-08-26  Kukuh Syafaat  <kukuhsyafaat@gnome.org>
+
+	Update Indonesian translation
+
+2018-08-16  Sam Thursfield  <sam@afuera.me.uk>
+
+	Merge branch 'sam/domain-rules-outside-usr'
+	See https://gitlab.gnome.org/GNOME/tracker/merge_requests/14
+
+	Merge branch 'sam/tracker-sparql-connection-set-dbus-connection'
+	See https://gitlab.gnome.org/GNOME/tracker/merge_requests/14
+
 2018-08-16  Carlos Garnacho  <carlosg@gnome.org>
 
 	Release 2.1.2
@@ -52,6 +172,57 @@
 	We were doing an unnecessary intltool-merge step for the file
 	org.freedesktop.Tracker1.service while failing to do the necessary
 	configuration substitution. Oops.
+
+	libtracker-sparql: Don't use 'namespace' as a parameter name
+	This header was unusable from C++ code as 'namespace' is a reserved
+	keyword there.
+
+	Based on a patch by Santtu Lakkala from
+	https://bugzilla.gnome.org/show_bug.cgi?id=791510
+
+2018-08-11  Sam Thursfield  <sam@afuera.me.uk>
+
+	Allow use of domain rules that aren't installed into /usr
+	Currently Tracker domain rules must be installed inside Tracker's data
+	directory (usually /usr/share/tracker). This is limiting as it means
+	only system packages can add them. A program installed into /opt is
+	unable to use a custom domain, for example. Since Tracker is implemented
+	as a system of daemons, it's not particularly straight forward to work
+	around this by setting XDG_DATA_DIRS= to point somewhere non-standard
+	either.
+
+	This patch removes this restriction in a simple way: it allows users to
+	pass a full path to the domain rule, rather than just the base name.
+
+	tracker_domain_ontology_get_domain() should return only the domain name
+	We should be consistent about what the name of a Tracker domain actually
+	is. In the domain rule we specify Domain=org.freedesktop (for the
+	default rule) or Domain=org.example.App (for a custom domain). But
+	internally tracker_domain_ontology_get_domain() would return
+	org.freedesktop.Tracker1 or org.example.App.Tracker1, i.e. the domain
+	name now has '.Tracker1' appended.
+
+	This does make sense in most cases, but it means there's no way to get
+	the actual name of the domain from a TrackerDomainOntology object. This
+	commit changes the existing function to not append '.Tracker1' in the
+	value it returns, which means that function can now be used to get the
+	base name of the domain. The assumption is that callers are normally
+	appending stuff to this base name anyway so it's not much extra effect
+	to also append the '.Tracker1' component if needed.
+
+	libtracker-common is internal to Tracker so this doesn't constitute a
+	public API break.
+
+	Add tracker_sparql_connection_get/set_dbus_connection()
+	Currently it's only possible to open a TrackerSparqlConnection to
+	an instance of Tracker that is running on the session-wide message bus.
+
+	There are use cases for running the Tracker daemons on a private
+	session bus though. In fact it's necessary to do this if you want to
+	set up a custom domain without having to become root and create .service
+	files in /usr/share/dbus-1/services. It would also be useful for the
+	functional-tests to be able to use libtracker-sparql instead of having
+	to talk directly to Tracker's D-Bus API.
 
 2018-08-10  Sam Thursfield  <sam@afuera.me.uk>
 
