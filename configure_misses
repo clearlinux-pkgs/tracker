@@ -1,6 +1,3 @@
 Configure miss: WIN32
 Configure miss: sb_stemmer_new in -lstemmer
 Configure miss: up_client_get_on_low_battery
-Configure miss: tracker-data-manager.c:2937:38: warning: format not a string literal and no format arguments [-Wformat-security]
-
-Configure miss: tracker-data-manager.c:2970:38: warning: format not a string literal and no format arguments [-Wformat-security]

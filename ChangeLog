@@ -1,3 +1,29 @@
+2018-09-04  Carlos Garnacho  <carlosg@gnome.org>
+
+	Relese 2.1.4
+
+2018-09-03  Sam Thursfield  <sam@afuera.me.uk>
+
+	Merge branch '34-build-failure-with-werror-format-security'
+	See https://gitlab.gnome.org/GNOME/tracker/merge_requests/20
+
+2018-09-03  Tim Lunn  <tim@feathertop.org>
+
+	libtracker-data: Fix build with format-security flag
+	Closes:https://gitlab.gnome.org/GNOME/tracker/issues/34
+
+2018-09-02  gogo  <trebelnik2@gmail.com>
+
+	Update Croatian translation
+
+2018-09-01  Ask Hjorth Larsen  <asklarsen@gmail.com>
+
+	Updated Danish translation
+
+2018-08-31  Rūdolfs Mazurs  <rudolfs.mazurs@gmail.com>
+
+	Update Latvian translation
+
 2018-08-30  Carlos Garnacho  <carlosg@gnome.org>
 
 	Release 2.1.3
