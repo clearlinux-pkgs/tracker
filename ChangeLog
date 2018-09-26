@@ -1,3 +1,116 @@
+2018-09-26  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 2.1.5
+
+	libtracker-data: Chain up correctly on TrackerDataManager::dispose
+	It was wrongly chaining up to finalize...
+
+	tracker-store: Destroy the direct connection on exit
+	And let it shut down the internal data manager. Fixes possible crashes
+	as the TrackerDirectConnection is not disposed and there may be other
+	internal threads trying to access the TrackerDataManager after shutdown.
+
+	libtracker-miner: Avoid crawling through children of non-recursive dir
+	The direct children would be crawled, which is pretty useless.
+
+2018-09-09  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-miner: Small optimization
+	Using get_file() should be equivalent to peek_file() given that the
+	file is already interned, but the latter takes less detours to find
+	this out.
+
+	libtracker-miner: group elements on tracker_decorator_next() query
+	This query would deduplicate files by their matching rdf:types, which
+	may possibly return the same file multiple types if the file as
+	several types that satisfy the query. Group by the URN so we only get
+	each element exactly once.
+
+	libtracker-miner: Untangle SPARQL buffer task memory management
+	On one hand, the refcounting assignment was wrong, the task callback
+	is meant to receive a reference on the TrackerTask where it was
+	getting none.
+
+	On the other hand, after fixing it there is a circular reference
+	between the GTask and the TrackerTask that would prevent both to
+	be freed, break it by disposing the GTask as soon as it's dispatched.
+
+	libtracker-miner: Plug leak
+
+	libtracker-common: Plug leak
+
+	libtracker-sparql: Plug leak
+
+	libtracker-direct: Plug leaks
+
+	libtracker-miner: Fix lookup of already interned files
+	This code had several wrongs here:
+	- The tracker_file_system_is_file_interned got the check_fs
+	  parameter wrong, creating an additional copy of the file.
+	  This would be inocuous as the later lookup would succeed,
+	  except
+	- The extra copy of the file was being leaked
+	- And actually the later lookup is somewhat superfluous if
+	  we are checking the NodeLookupData. We can shortcircuit
+	  lookup of files already interned in this TrackerFileSystem
+	  even further.
+
+	This all is fixed now, the tracker_file_system_is_file_interned()
+	function got open coded in the caller function so we can perform
+	the fast path, the check has been corrected, and even if we would
+	fall through the paths that do need a copy, it wouldn't be leaked.
+
+	tests: Fix TrackerFileNotifier tests teardown
+	Be a little bit more polite and delete the folder after closing the
+	connection. Prevents warnings (and test failures) on its finalize
+	paths.
+
+	libtracker-miner: Unparent children on TrackerFileSystem root dispose
+	We unparented children on intermediate folders, but didn't handle the
+	case of the root folder disappearing. Unparent the child nodes so
+	they get correctly freed when the respective GFiles are disposed.
+
+2018-09-06  Stas Solovey  <whats_up@tut.by>
+
+	Update Russian translation
+
+2018-09-05  Sam Thursfield  <sam@afuera.me.uk>
+
+	Merge remote-tracking branch 'origin/wip/carlosg/meson-fixes'
+	See https://gitlab.gnome.org/GNOME/tracker/merge_requests/22
+
+2018-09-05  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-control: Add linker script
+	So we only export the desired symbols
+
+	libtracker-miner: Add linker script
+	So we only export the desired symbols
+
+	libtracker-sparql: Add linker script
+	So we only export the desired symbols
+
+	libtracker-miner: Generate vapi file
+
+	libtracker-control: Generate vapi file
+
+	libtracker-miner: Install tracker-miner.xml with meson
+	This is done in autotools
+
+	build: Do not install builtin ontology
+	It is compiled as a GResource
+
+	build: Do not use meson.source_root()
+	As advised in the meson porting wiki page.
+
+	tests: Link tracker-bus functional tests to libtracker-bus
+	The static library randomly fails to be linked otherwise.
+
+	tests: Link to internal library in libtracker-miner tests
+	It does test internal API, so explicitly link to it.
+
+	libtracker-sparql: Mark some internal TrackerResource methods as static
+
 2018-09-04  Carlos Garnacho  <carlosg@gnome.org>
 
 	Relese 2.1.4
