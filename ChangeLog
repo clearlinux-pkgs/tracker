@@ -1,3 +1,76 @@
+2018-11-05  Carlos Garnacho  <carlosg@gnome.org>
+
+	Release 2.1.6
+
+	build: Fix dependency tree in libtracker_sparql_dep
+	Instead of explicitly linking to intermediate libraries in
+	src/libtracker-sparql, have it depend on the dependency declared there.
+	Should provide the right -L/-l arguments when using the
+	libtracker_sparql_dep dependence.
+
+	Failure seen in:
+	https://gitlab.gnome.org/GNOME/gnome-build-meta/-/jobs/125673
+
+	build: Set proper soversion to libraries
+	Leaving to '0' is not enough if several versions of the library are
+	installed (say, in different prefixes). Add back the library soversion,
+	similarly to how it was done in autotools.
+
+	build: Use build_by_default to generate ontology docs
+	The build_always option is deprecated since meson 0.38.0
+
+	docs: Fix xrefs to glib docs
+	So we get proper links to glib types.
+
+	build: Fixes to docs generation
+	The docs were not going through gtkdoc-scangobj, and the libtracker-sparql
+	docs were just looking in source dir while it should also look for gtk-doc
+	comments in generated files from vala.
+
+	Now that we're there, use include_directories() to get rid of relative
+	paths.
+
+	build: Do not link libtracker-data.so to libtracker-sparql.so
+	Even though libtracker-data uses types from libtracker-sparql, this
+	is the wrong way around. However, doing the right thing here still
+	breaks because meson is playing smart here and passes --no-undefined
+	for every shared library by default, so build breaks with obviously
+	undefined symbols.
+
+	Correct the dependency tree to be exactly how it was with autotools,
+	and override b_lundef when building libtracker-data to leave the
+	borrowed symbols undefined. The gaps will be filled in because
+	everyone must link with libtracker-sparql.
+
+	Closes: https://gitlab.gnome.org/GNOME/tracker/issues/44
+
+	build: override prefix on all system install locations
+	Following https://www.bassi.io/articles/2018/03/15/pkg-config-and-paths/,
+	this includes dbus service, bash completion, gir and typelib paths.
+
+	Unfortunately, the path for systemd user units cannot be overriden, so
+	use a path made from our libdir path.
+
+	This allows for trouble free builds by just defining prefix. If installing
+	onto system paths was desirable on some setups, it might return through a
+	-Duse_system_paths boolean build option that disables the overrides, but
+	this is a preferrable default.
+
+	Merge branch 'wip/jtojnar/2.1-dist-fix' into tracker-2.1
+
+2018-10-27  Dušan Kazik  <prescott66@gmail.com>
+
+	Update Slovak translation
+
+2018-10-01  Jan Tojnar  <jtojnar@gmail.com>
+
+	build: Include map files in dist tarball
+	Fixes 2.1.5 build with Meson
+
+2018-09-29  Марко Костић  <marko.m.kostic@gmail.com>
+
+	Update Serbian translation
+
 2018-09-26  Carlos Garnacho  <carlosg@gnome.org>
 
 	Release 2.1.5
