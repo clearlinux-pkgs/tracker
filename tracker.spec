@@ -4,7 +4,7 @@
 #
 Name     : tracker
 Version  : 2.1.6
-Release  : 17
+Release  : 18
 URL      : https://download.gnome.org/sources/tracker/2.1/tracker-2.1.6.tar.xz
 Source0  : https://download.gnome.org/sources/tracker/2.1/tracker-2.1.6.tar.xz
 Summary  : A library to monitor/control tracker miners
@@ -47,14 +47,6 @@ Patch1: 0001-don-t-autostart-by-default.patch
 Tracker is a search engine and that allows the user to find their
 data as fast as possible. Users can search for their files and
 search for content in their files too.
-
-%package abi
-Summary: abi components for the tracker package.
-Group: Default
-
-%description abi
-abi components for the tracker package.
-
 
 %package bin
 Summary: bin components for the tracker package.
@@ -167,7 +159,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1542072519
+export SOURCE_DATE_EPOCH=1542757912
 %configure --disable-static --enable-minimal --enable-tracker-fts=no --enable-icu-charset-detection=no --disable-functional-tests
 make  %{?_smp_mflags}
 
@@ -179,7 +171,7 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 make VERBOSE=1 V=1 %{?_smp_mflags} check || :
 
 %install
-export SOURCE_DATE_EPOCH=1542072519
+export SOURCE_DATE_EPOCH=1542757912
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/tracker
 cp COPYING.GPL %{buildroot}/usr/share/package-licenses/tracker/COPYING.GPL
@@ -195,12 +187,6 @@ mv %{buildroot}%{_sysconfdir}/xdg %{buildroot}%{_datadir}/.
 
 %files
 %defattr(-,root,root,-)
-
-%files abi
-%defattr(-,root,root,-)
-/usr/share/abi/libtracker-control-2.0.so.0.abi
-/usr/share/abi/libtracker-miner-2.0.so.0.abi
-/usr/share/abi/libtracker-sparql-2.0.so.0.abi
 
 %files bin
 %defattr(-,root,root,-)
