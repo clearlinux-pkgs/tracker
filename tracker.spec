@@ -4,7 +4,7 @@
 #
 Name     : tracker
 Version  : 2.1.6
-Release  : 18
+Release  : 19
 URL      : https://download.gnome.org/sources/tracker/2.1/tracker-2.1.6.tar.xz
 Source0  : https://download.gnome.org/sources/tracker/2.1/tracker-2.1.6.tar.xz
 Summary  : A library to monitor/control tracker miners
