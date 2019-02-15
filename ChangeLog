@@ -1,3 +1,63 @@
+2019-02-06  Jürg Billeter  <j@bitron.ch>
+
+	Release 2.1.7
+
+	libtracker-data: Fix build with Vala 0.43
+	https://gitlab.gnome.org/GNOME/tracker/issues/75
+
+2019-01-17  Charles Monzat  <charles.monzat@numericable.fr>
+
+	Update French translation
+
+2018-11-17  Iñaki Larrañaga Murgoitio  <dooteo@zundan.com>
+
+	Update Basque translation
+
+2018-11-09  Carlos Garnacho  <carlosg@gnome.org>
+
+	libtracker-data: Add missing HAVE_TRACKER_FTS guards
+	Fixes build error with -Dfts=false, and a warning that must have
+	been there forever.
+
+	Closes: https://gitlab.gnome.org/GNOME/tracker/issues/53
+
+2018-11-08  Carlos Garnacho  <carlosg@gnome.org>
+
+	tests: Update tracker-fts-test to using a local TrackerSparqlConnection
+	Instead of using internals directly. Also make sure the database location
+	dir is a brand new temporary directory each time.
+
+	(cherry picked from dbff7ef3198c7531909917f4ef93f94995328c45)
+
+	libtracker-data: Drop FTS table/view before ontology updates
+	Sqlite >= 3.25.0 got stricter 'alter table ... rename ...' behavior
+	where the renaming affects all references to the table across the
+	database. This is at odds with our fts_view view on schema updates
+	due to ontology changes, as we first migrate (rename current table,
+	create new one, insert previous content, drop old table) all resource
+	tables before doing the FTS table/view updates. This causes rename
+	failures due to the fts_view referencing the renamed and dropped
+	tables.
+
+	Change the ontology update code so we delete the FTS table/view
+	before changing resource tables in case of FTS updates. This makes
+	the behavior correct both before and after the Sqlite change.
+
+	https://gitlab.gnome.org/GNOME/tracker/issues/40
+
+2018-11-06  Carlos Garnacho  <carlosg@gnome.org>
+
+	build: Fix build order with libtracker-sparql generated headers
+	Both libtracker-fts and libtracker-data end up requiring includes
+	from tracker-sparql.h, but we have to generate tracker-generated.h
+	first.
+
+	It's pretty terrible to add intermediate targets as a dependency
+	outside the libtracker-sparql directory, but it doesn't seem we
+	can do better.
+
+	Closes: https://gitlab.gnome.org/GNOME/tracker/issues/52
+
 2018-11-05  Carlos Garnacho  <carlosg@gnome.org>
 
 	Release 2.1.6
