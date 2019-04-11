@@ -1,28 +1,97 @@
-NEW in 2.1.7 - 2019-02-06
+NEW in 2.2.1 - 2019-03-06
 =========================
 
-  * Fix build order with libtracker-sparql generated headers
-  * Fix ontology update with SQLite 3.25
-  * Fix build with Vala 0.43
+  * Fix unichar unescaping
+  * Correctly Handle BIND in first place of a triples block
+  * Fix possible deadlock on WAL checkpoint
+  * Fix some double values not being deleted
+  * Fixed CHANGES_DONE_HINT handling in TrackerMonitor
+  * Ported data generator utilities to python3
+  * Ported functional tests to python3, reformatted to PEP-8
+  * Correctly apply ignored-directories-with-content filter on monitor updates
+  * Build and test fixes
 
-Translations: eu, fr
+Translations: de, eo, fur, fr, it, ko, lv, nl, ru, sr
 
-NEW in 2.1.6 - 2018-10-05
+NEW in 2.2.0 - 2019-02-20
 =========================
 
-  * Backported multiple meson build fixes.
-  * Fixed meson build from released tarball
+  * Multiple memory leak and corruption fixes
+  * Bumped glib minimum version to 2.46, it already was in practical terms
+  * Test suite improvements
+  * Restore log domain
 
-Translations: sk, sr
+Translations: ca, cs, da, kk, lt, pt_BR, sv, zh_TW
 
-NEW in 2.1.5 - 2018-09-26
-=========================
+  Highlighted changes since 2.1.x:
+  --------------------------------
 
-  * Plug several leaks
-  * Fix possible crashes on tracker-store exit
-  * Several fixes to meson build
+  * New SPARQL parser, able to generate SQL that is generally more readable
+    and at places performs better. Multiple buglets fixed in the process
+  * Much improved support of SPARQL1.1 features and syntax that was missing:
+    - Property paths: Allowing to match connectivity between two resources
+      by an arbitrary length path. There is a number of supported operators
+      (alternative, sequence, oneOrMany, ...) that can be combined, e.g:
 
-Translations: ru
+      SELECT ?s ?p { ?s ^(nfo:belongsToContainer*)/(nie:url|nie:title) ?p }
+
+      Only the negated path operator (!) is not supported at the moment.
+
+    - Support for fully unrestricted queries, eg:
+
+      SELECT ?s ?p ?o { ?s ?p ?o } ORDER BY ?o ?p ?s
+
+      Queries with unrestricted predicate (?p in the example above) were
+      just supported in a very restricted set of situations. All those
+      limitations are gone.
+    - MINUS allows subtracting the solutions that match the given triples
+      template, eg:
+
+      SELECT ?s { ?s a nfo:Media } MINUS { ?s a nfo:MusicPiece }
+
+  * Support for prepared statements. TrackerSparqlStatement can be built
+    with SELECT queries containing (custom) ~var syntax, and updating
+    their values before obtaining a cursor.
+  * Many tests were added, and Tracker is generally much better tested thanks
+    to CI.
+  * tracker-store now automatically shuts down on inactivity.
+
+  NOTE TO PACKAGERS: This release might trigger ABI checks, as
+    TrackerSparqlConnectionClass struct size grew. This object can only
+    be subclassed within Tracker and instantiated through Tracker API, so
+    the change is inconsequential.
+
+NEW in 2.2.0-alpha2 - 2019-02-06
+================================
+
+  * More property paths supported, new operators supported are *, +, ? and |,
+    only the ! operator is not supported yet.
+  * Multiple fixes to the new sparql parser.
+  * Improve error handling in DBus backend
+  * Many improvements and additions to the test suite
+  * Fixed potential crash in TrackerMonitor.
+
+Translations: el, es, fur, fr, gl, id, pl, ro, sl, sv, tr
+
+NEW in 2.2.0-alpha1 - 2018-11-13
+================================
+
+  * New SPARQL parser, able to support more 1.1 features and generating
+    friendlier SQL at places. There is initial support for property
+    paths (/ and ^), and other missing 1.1 syntax (MINUS, SHA384, ...).
+    More improvements are expected to happen in the future thanks to this.
+  * Support for prepared statements. TrackerSparqlStatement can be built
+    with SELECT queries containing (custom) ~var syntax, and updating
+    their values before obtaining a cursor.
+  * Added global libtracker-sparql call to change the used DBus connection
+    at runtime.
+  * Made tracker-store to automatically shutdown when unneeded.
+  * Fixed ontology updates to work with behavioral changes in
+    sqlite >=3.25.
+  * Support for building through autotools has been removed.
+  * Other many build and code cleanups and fixes
+
+Translations: pl, sl, sr
 
 NEW in 2.1.4 - 2018-09-04
 =========================

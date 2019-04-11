@@ -1,1 +1,3 @@
---enable-minimal --enable-tracker-fts=no --enable-icu-charset-detection=no --disable-functional-tests
+-Dfts=false
+-Dfunctional_tests=false
+-Dsystemd_user_services=/usr/lib/systemd/user

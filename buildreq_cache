@@ -1,2 +1,5 @@
-2.1.6
+2.2.1
+bash-completion-dev
+pkgconfig(bash-completion)
+pkgconfig(libnm)
 upower-dev
