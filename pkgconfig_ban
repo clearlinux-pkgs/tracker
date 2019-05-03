@@ -11,7 +11,6 @@ gstreamer-tag-1.0
 icu-i18n
 icu-uc
 libavformat
-libavutil
 libcue
 libexif
 libgsf-1

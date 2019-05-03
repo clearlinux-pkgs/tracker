@@ -1,4 +1,4 @@
-2.2.1
+2.2.2
 bash-completion-dev
 pkgconfig(bash-completion)
 pkgconfig(libnm)
