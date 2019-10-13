@@ -4,7 +4,7 @@
 #
 Name     : tracker
 Version  : 2.3.1
-Release  : 25
+Release  : 26
 URL      : https://download.gnome.org/sources/tracker/2.3/tracker-2.3.1.tar.xz
 Source0  : https://download.gnome.org/sources/tracker/2.3/tracker-2.3.1.tar.xz
 Summary  : Desktop-neutral user information store, search tool and indexer
@@ -134,7 +134,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1570993250
+export SOURCE_DATE_EPOCH=1570994435
 # -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
@@ -151,14 +151,17 @@ ninja -v -C builddir
 
 %install
 mkdir -p %{buildroot}/usr/share/package-licenses/tracker
-cp COPYING.GPL %{buildroot}/usr/share/package-licenses/tracker/COPYING.GPL
-cp COPYING.LGPL %{buildroot}/usr/share/package-licenses/tracker/COPYING.LGPL
-cp src/libtracker-common/COPYING.LIB %{buildroot}/usr/share/package-licenses/tracker/src_libtracker-common_COPYING.LIB
-cp src/libtracker-data/COPYING.LIB %{buildroot}/usr/share/package-licenses/tracker/src_libtracker-data_COPYING.LIB
-cp src/libtracker-miner/COPYING.LIB %{buildroot}/usr/share/package-licenses/tracker/src_libtracker-miner_COPYING.LIB
-cp utils/ontology/resources/LICENSE.txt %{buildroot}/usr/share/package-licenses/tracker/utils_ontology_resources_LICENSE.txt
+cp %{_builddir}/tracker-2.3.1/COPYING.GPL %{buildroot}/usr/share/package-licenses/tracker/33fabce185708a9b17df7a9f37c7ed44eddc7e48
+cp %{_builddir}/tracker-2.3.1/COPYING.LGPL %{buildroot}/usr/share/package-licenses/tracker/9a1929f4700d2407c70b507b3b2aaf6226a9543c
+cp %{_builddir}/tracker-2.3.1/src/libtracker-common/COPYING.LIB %{buildroot}/usr/share/package-licenses/tracker/9a1929f4700d2407c70b507b3b2aaf6226a9543c
+cp %{_builddir}/tracker-2.3.1/src/libtracker-data/COPYING.LIB %{buildroot}/usr/share/package-licenses/tracker/9a1929f4700d2407c70b507b3b2aaf6226a9543c
+cp %{_builddir}/tracker-2.3.1/src/libtracker-miner/COPYING.LIB %{buildroot}/usr/share/package-licenses/tracker/9a1929f4700d2407c70b507b3b2aaf6226a9543c
+cp %{_builddir}/tracker-2.3.1/utils/ontology/resources/LICENSE.txt %{buildroot}/usr/share/package-licenses/tracker/2a048acc60f0c772323612a467cdfb0718c1ba0e
 DESTDIR=%{buildroot} ninja -C builddir install
 %find_lang tracker
+## install_append content
+mv %{buildroot}/etc/xdg %{buildroot}/usr/share/
+## install_append end
 
 %files
 %defattr(-,root,root,-)
@@ -274,6 +277,7 @@ DESTDIR=%{buildroot} ninja -C builddir install
 %defattr(-,root,root,-)
 /usr/lib/systemd/user/tracker-store.service
 /usr/share/dbus-1/services/org.freedesktop.Tracker1.service
+/usr/share/xdg/autostart/tracker-store.desktop
 
 %files lib
 %defattr(-,root,root,-)
@@ -291,12 +295,9 @@ DESTDIR=%{buildroot} ninja -C builddir install
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/package-licenses/tracker/COPYING.GPL
-/usr/share/package-licenses/tracker/COPYING.LGPL
-/usr/share/package-licenses/tracker/src_libtracker-common_COPYING.LIB
-/usr/share/package-licenses/tracker/src_libtracker-data_COPYING.LIB
-/usr/share/package-licenses/tracker/src_libtracker-miner_COPYING.LIB
-/usr/share/package-licenses/tracker/utils_ontology_resources_LICENSE.txt
+/usr/share/package-licenses/tracker/2a048acc60f0c772323612a467cdfb0718c1ba0e
+/usr/share/package-licenses/tracker/33fabce185708a9b17df7a9f37c7ed44eddc7e48
+/usr/share/package-licenses/tracker/9a1929f4700d2407c70b507b3b2aaf6226a9543c
 
 %files man
 %defattr(0644,root,root,0755)
