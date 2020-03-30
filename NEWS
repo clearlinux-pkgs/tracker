@@ -1,3 +1,24 @@
+NEW in 2.3.4 - 2020-03-10
+=========================
+  * Brown paper bag release, fix NULL check.
+
+NEW in 2.3.3 - 2020-03-09
+=========================
+  * Fix race condition during tracker-store shutdown maybe leading to
+    warnings and missed writeback events.
+  * Made fts:offsets stronger against corrupt FTS tables
+
+Translations: ja
+
+NEW in 2.3.2 - 2020-02-18
+=========================
+
+  * Location info for photos is now inserted into the DB. It didn't
+    work before as we failed to process SPARQL "blank nodes" correctly.
+  * Fix for oversensitive FTS5 index corruption detection
+
+Translations: ms
+
 NEW in 2.3.1 - 2019-10-12
 =========================
 
