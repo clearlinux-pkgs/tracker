@@ -1,5 +1,5 @@
 PKG_NAME := tracker
-URL = https://download.gnome.org/sources/tracker/2.3/tracker-2.3.4.tar.xz
+URL = https://download.gnome.org/sources/tracker/3.0/tracker-3.0.0.tar.xz
 ARCHIVES = 
 
 include ../common/Makefile.common

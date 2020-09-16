@@ -1,3 +1,4 @@
 -Dfts=false
 -Dfunctional_tests=false
--Dsystemd_user_services=/usr/lib/systemd/user
+-Dman=false
+-Ddoc=false

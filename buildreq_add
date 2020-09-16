@@ -7,3 +7,4 @@ gobject-introspection-dev
 libexif-dev
 gstreamer-dev
 libjpeg-turbo-dev
+systemd-dev

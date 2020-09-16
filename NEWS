@@ -1,32 +1,91 @@
-NEW in 2.3.4 - 2020-03-10
-=========================
-  * Brown paper bag release, fix NULL check.
-
-NEW in 2.3.3 - 2020-03-09
-=========================
-  * Fix race condition during tracker-store shutdown maybe leading to
-    warnings and missed writeback events.
-  * Made fts:offsets stronger against corrupt FTS tables
-
-Translations: ja
-
-NEW in 2.3.2 - 2020-02-18
+NEW in 3.0.0 - 2020-09-13
 =========================
 
-  * Location info for photos is now inserted into the DB. It didn't
-    work before as we failed to process SPARQL "blank nodes" correctly.
-  * Fix for oversensitive FTS5 index corruption detection
+Translations: da, de, it, kk, ko, lv
 
-Translations: ms
+NEW in 2.99.5 - 2020-09-07
+==========================
+  * Fix DBus logging in tracker-sandbox test helper
+  * Removed programming terms from English stop word list
+  * Handle empty input correctly
+  * Fix possible database locks when using "tracker3 sql" on a
+    running database
+  * Fixes for SERVICE clauses in UNIONs
+  * Handle empty group graph patterns as per the spec
+  * Fixes to property paths being used in different graphs
+  * Release memory on inactivity
+  * Fix build/linking with 2.x in the system
+  * Add "tracker3 export --2to3" helper for data migrations
+  * Hide FTS5 search syntax from fts:match
 
-NEW in 2.3.1 - 2019-10-12
-=========================
+Translations: cs, fr, fur, gl, hr, id, lt, pt_BR, zh_CN
 
-  * Fixed a case where old data was not deleted correctly from the store when
-    inserting new values. This was causing tracker-extract to log errors for
-    multi-disc music albums stored as FLAC files with embedded CUE sheets.
+NEW in 2.99.4 - 2020-08-24
+==========================
+  * CLI modernization
+    - integration with pager
+    - bash completion for endpoints
+  * Use curly quotes consistently in CLI options
+  * SPARQL parsing fixes
+  * Multiple fixes around 'VALUES' SPARQL syntax
+  * Fix race conditions around graph creation
+  * Better use of asserts in tests
 
-Translations: sk
+Translations: en_GB, es, eu, gl, pl, pt_BR, ro, sl, tr, uk
+
+NEW in 2.99.3 - 2020-08-10
+==========================
+  * Add portal
+  * Use WAL on all database connections
+  * Fix race conditions in reusable statements
+  * Documentation fixes and improvements
+  * Better errors from library function calls
+  * Test fixes
+  * CI improvements
+
+NEW in 2.99.2 - 2020-06-26
+==========================
+  * Dropped priority argument from tracker_sparql_connection_update*()
+  * Better parser error messages
+  * SPARQL correctness fixes
+  * Fixes to tracker_sparql_cursor_is_bound() checks
+  * Ontology clean ups and sync ups with Nepomuk
+  * Fixed lifetime of blank node labels
+  * Fixes to recursive property paths
+  * Ensure property functions pick non NULL values
+  * Several fixes merge SERVICE{} data with the local graph pattern
+  * Add `tracker export --show-graphs` CLI subcommand to show available
+    graphs
+  * Parameter bindings within SERVICE{} clauses are now allowed
+  * Fixes to single/double quote escaping
+  * Fixes to make tracker-sandbox more usable in tests
+  * Many cleanups, memory leak and performance fixes
+
+NEW in 2.99.1 - 2020-05-03
+==========================
+
+  Highlighted updates compared to 2.x:
+  ------------------------------------
+  * A full implementation of SPARQL 1.1
+  * A change of paradigm. There is no central store, services are
+    free to create their own, and to make those an endpoint for public
+    access. Applications may syndicate queries across external endpoints
+    through the SERVICE syntax.
+  * No tracker-store
+  * No libtracker-miner
+  * No libtracker-control
+  * API changes
+    - Explicit API to create a local store, or proxy a DBus/remote one
+    - TrackerEndpoint proxies local stores out of process
+    - separate python library to write tests
+  * A base and reference ontologies of our own
+    - Officially it's no longer Nepomuk
+    - No more broken links
+  * An extensible CLI tool, with a generic set of core subcommands
+  * Parallel installable to tracker 2.x
+  * Documentation
+  * Tests
+  * Many many others
 
 NEW in 2.3.0 - 2019-09-09
 =========================

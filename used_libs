@@ -3,12 +3,10 @@ libgcc_s.so.1
 libgio-2.0.so.0
 libglib-2.0.so.0
 libgobject-2.0.so.0
-libicui18n.so.64
-libicuuc.so.64
+libicui18n.so.67
+libicuuc.so.67
 libjson-glib-1.0.so.0
 libm.so.6
-libnm.so.0
 libsoup-2.4.so.1
 libsqlite3.so.0
-libuuid.so.1
 libxml2.so.2
