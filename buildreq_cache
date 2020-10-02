@@ -1,4 +1,4 @@
-3.0.0
-asciidoc
+3.0.1
 bash-completion-dev
+docbook-xml
 pkgconfig(bash-completion)
