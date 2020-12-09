@@ -1,10 +1,10 @@
 # This file contains additional build requirements that did not get
 # picked up automatically. One name per line, no whitespace.
-libsoup-dev
-json-glib-dev
-libunistring-dev
 gobject-introspection-dev
-libexif-dev
 gstreamer-dev
+json-glib-dev
+libexif-dev
 libjpeg-turbo-dev
+libsoup-dev
+libunistring-dev
 systemd-dev
