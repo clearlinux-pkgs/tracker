@@ -1,25 +1,78 @@
-NEW in 3.0.3 - 2021-01-10
+NEW in 3.1.1 - 2021-04-02
 =========================
+  * Better error handling during database initialization
+  * Implemented tracker_sparql_connection_update_array_async
+    over TrackerBatch, resulting in lower memory usage.
+  * VAPI updates
+  * Updated tracker_sparql_connection_update_array docs
+  * Leak and double free fixes
+
+Translations: en_GB, nl, zh_CN
+
+NEW in 3.1.0 - 2021-03-20
+=========================
+  * Add build-time warning for SQLite 3.35.[01]
+  * Workaround other SQLite 3.35 bug
+
+  Highlighted changes since 3.0:
+  * New, faster API for updates, see TrackerBatch and
+    tracker_sparql_connection_update_resource
+  * New API to create HTTP endpoints, see
+    tracker_endpoint_http_new
+  * New tracker:strip-punctuation SPARQL function
+  * Multiple performance improvements
+  * Several SPARQL 1.1 correctness fixes
+
+NEW in 3.1.0.rc - 2021-03-14
+============================
+  * Add tracker_sparql_connection_bus_new_async()
+  * Fix TrackerNotifier signal subscriptions across the portal
+  * Fix race condition / crash when performing SELECT queries
+  * Propagate errors better when updating the database
+  * Do not miss valid prefixed names in TrackerResource
+  * Sparql 1.1 correctness fixes
+  * Handle nesting of multivalued property functions
+  * CI improvements in JUnit test results
+
+Translations: fr, gl, hr, ko, pl, sr, tr
+
+NEW in 3.1.0.beta - 2021-02-14
+==============================
+  * Fix possible crash in fts:offsets function
+  * Handle variables as service URIs, e.g.
+    SERVICE ?s { ... } VALUES ?s { ... }
+  * Add more g-i-r annotations
+  * Improve ellipsizing in CLI tools
+
+Translations: cs, fur, hu, id, pt_BR, sl, sr, sv, tr
+
+NEW in 3.1.0.alpha - 2021-01-10
+===============================
+  * Add TrackerBatch, object made to hold multiple updates
+    (in SPARQL string form, or TrackerResource) that will
+    be performed atomically.
+  * Add TrackerEndpointHttp, a TrackerEndpoint subclass to
+    implement a (readonly) SPARQL HTTP endpoint as per
+    https://www.w3.org/TR/2013/REC-sparql11-protocol-20130321/
+  * Add tracker:strip-punctuation SPARQL function
+  * Specify that nfo:duration is expressed in seconds
+  * Fix portal initialization order
+  * Improve TTL parser
+  * Improve date/time parsing
+  * Make handling of large series of UPDATEs iteratively
+    to avoid stack size limits
+  * Improve parallelization of queries
+  * Optimize idempotent DELETE operations
+  * Optimize insert operations
+  * Optimize database resource refcount management
+  * Fix tracker_notifier_signal_subscribe annotation
+  * Fix possible race conditions handling ontology objects
+  * Handle NULL arguments in tracker:uri-is-parent
   * Avoid FTS5 table inconsistency with SQLite >= 3.34.0
-  * Fix out parameter in VAPI/Vala files
+  * Memory leak fixes
+  * Documentation improvements
 
-Translations: ro
-
-NEW in 3.0.2 - 2020-12-08
-=========================
-  * Update some wording in website
-  * Fix initialization issues in portal
-  * Improve turtle parser
-  * Improve checks for dates in the far past/future
-  * Cleanup meson build options
-  * Fix invalid reads
-  * Make UPDATE parser tree processing iterative rather
-    than recursive
-  * Fix errors in tracker:uri-is-parent
-  * Protect harder against invalid database state
-  * Introspection annotation fixes
-  * Improve thread safety of internal ontology objects
-  * Add missing <package> element to gir file
+Translations: ca, de, es, eu, fur, gl, lt, ro, uk, zh_TW
 
 NEW in 3.0.1 - 2020-10-02
 =========================
