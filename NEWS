@@ -1,13 +1,66 @@
-NEW in 3.1.2 - 2021-06-11
+NEW in 3.2.0 - 2021-09-18
 =========================
+  * Fuller docs, with updated examples
+
+  Highlighted changes since 3.1:
+  * Improved developer experience when designing ontologies,
+    better handling of inconsistent ontologies, and more
+    accurate error reporting.
+  * Added new GDateTime helper API to resources, cursors
+    and statements.
+  * Several fixes to build and run on MacOS, with a brew
+    recipe now available.
+  * Added support for libsoup 3.x.
+  * Fresher and more complete documentation, built with hotdoc.
+  * Many other code fixes and performance improvements.
+
+Translations: da
+
+NEW in 3.2.0.rc - 2021-09-05
+============================
+  * Dropped bogus files from pre-generated documentation
+
+NEW in 3.2.0.beta - 2021-09-01
+==============================
+  * Improved error reporting when parsing ontologies
+  * Improvements to database rollback on ontology errors
+  * Ontology parsing crash fixes
+  * Make soup 2.x/3.x chosen at runtime
+  * Disable GVFS in functional tests
+  * Check accessible graphs when looking up resource URIs/IDs
+  * Port documentation to hotdoc
+  * Avoid "UPDATE ... FROM ..." SQL syntax only present in
+    recent SQLite versions.
+  * Multiple build, ci, website and maintenance improvements
+
+Translations: fi, ru, sk
+
+NEW in 3.2.0.alpha.1 - 2021-06-12
+=================================
+  * Brown paper bag release
+
+NEW in 3.2.0-alpha - 2021-06-11
+===============================
+  * Add support for libsoup 3.x
   * Add missing autocleanup functions
   * Support empty array updates
   * VAPI fixes
   * Add missing G_BEGIN_DECLS/G_END_DECLS guards
+  * Build fixes for macOS
+  * Code cleanups
   * Manpage fixes
+  * CI & unit test improvements
+  * Documentation fixes and updates
   * Fix crash in "tracker3 export --2to3" subcommand
+  * Handle arbitrary order of SERVICE and regular graph
+    patterns
+  * Added new GDateTime helper API to resources, cursors
+    and statements
+  * Implement missing TrackerSparqlConnection methods in
+    bus connections
+  * Many code cleanups and improvements
   * Fix rare bug that lead to triples being silently eaten
-  * Improvements to datetime handling
+  * Improvements to datetime comparisons
 
 Translations: el, ne, oc, zh_TW
 
