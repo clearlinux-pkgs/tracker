@@ -17,6 +17,8 @@ libtracker-sparql-3.0.so.0:tracker_bus_connection_new
 libtracker-sparql-3.0.so.0:tracker_bus_connection_new_finish
 libtracker-sparql-3.0.so.0:tracker_bus_connection_perform_query_call
 libtracker-sparql-3.0.so.0:tracker_bus_connection_perform_query_call_finish
+libtracker-sparql-3.0.so.0:tracker_bus_connection_perform_serialize
+libtracker-sparql-3.0.so.0:tracker_bus_connection_perform_serialize_finish
 libtracker-sparql-3.0.so.0:tracker_bus_connection_perform_update_array
 libtracker-sparql-3.0.so.0:tracker_bus_connection_perform_update_array_finish
 libtracker-sparql-3.0.so.0:tracker_bus_fd_cursor_construct
@@ -33,6 +35,7 @@ libtracker-sparql-3.0.so.0:tracker_endpoint_get_type
 libtracker-sparql-3.0.so.0:tracker_endpoint_http_get_type
 libtracker-sparql-3.0.so.0:tracker_endpoint_http_new
 libtracker-sparql-3.0.so.0:tracker_namespace_manager_add_prefix
+libtracker-sparql-3.0.so.0:tracker_namespace_manager_compress_uri
 libtracker-sparql-3.0.so.0:tracker_namespace_manager_expand_uri
 libtracker-sparql-3.0.so.0:tracker_namespace_manager_foreach
 libtracker-sparql-3.0.so.0:tracker_namespace_manager_get_default
@@ -49,6 +52,7 @@ libtracker-sparql-3.0.so.0:tracker_notifier_event_type_get_type
 libtracker-sparql-3.0.so.0:tracker_notifier_get_type
 libtracker-sparql-3.0.so.0:tracker_notifier_signal_subscribe
 libtracker-sparql-3.0.so.0:tracker_notifier_signal_unsubscribe
+libtracker-sparql-3.0.so.0:tracker_rdf_format_get_type
 libtracker-sparql-3.0.so.0:tracker_resource_add_boolean
 libtracker-sparql-3.0.so.0:tracker_resource_add_datetime
 libtracker-sparql-3.0.so.0:tracker_resource_add_double
@@ -90,6 +94,7 @@ libtracker-sparql-3.0.so.0:tracker_resource_set_relation
 libtracker-sparql-3.0.so.0:tracker_resource_set_string
 libtracker-sparql-3.0.so.0:tracker_resource_set_take_relation
 libtracker-sparql-3.0.so.0:tracker_resource_set_uri
+libtracker-sparql-3.0.so.0:tracker_serialize_flags_get_type
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_bus_new
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_bus_new_async
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_bus_new_finish
@@ -101,6 +106,8 @@ libtracker-sparql-3.0.so.0:tracker_sparql_connection_create_notifier
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_flags_get_type
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_get_namespace_manager
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_get_type
+libtracker-sparql-3.0.so.0:tracker_sparql_connection_load_statement_from_gresource
+libtracker-sparql-3.0.so.0:tracker_sparql_connection_map_connection
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_new
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_new_async
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_new_finish
@@ -109,6 +116,8 @@ libtracker-sparql-3.0.so.0:tracker_sparql_connection_query_async
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_query_finish
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_query_statement
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_remote_new
+libtracker-sparql-3.0.so.0:tracker_sparql_connection_serialize_async
+libtracker-sparql-3.0.so.0:tracker_sparql_connection_serialize_finish
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_update
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_update_array_async
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_update_array_finish
@@ -155,3 +164,5 @@ libtracker-sparql-3.0.so.0:tracker_sparql_statement_execute_finish
 libtracker-sparql-3.0.so.0:tracker_sparql_statement_get_connection
 libtracker-sparql-3.0.so.0:tracker_sparql_statement_get_sparql
 libtracker-sparql-3.0.so.0:tracker_sparql_statement_get_type
+libtracker-sparql-3.0.so.0:tracker_sparql_statement_serialize_async
+libtracker-sparql-3.0.so.0:tracker_sparql_statement_serialize_finish
