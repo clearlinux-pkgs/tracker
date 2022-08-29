@@ -7,6 +7,5 @@ gstreamer-dev
 json-glib-dev
 libexif-dev
 libjpeg-turbo-dev
-libsoup-dev
 libunistring-dev
 systemd-dev

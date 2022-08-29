@@ -4,7 +4,7 @@
 #
 Name     : tracker
 Version  : 3.3.3
-Release  : 41
+Release  : 42
 URL      : https://download.gnome.org/sources/tracker/3.3/tracker-3.3.3.tar.xz
 Source0  : https://download.gnome.org/sources/tracker/3.3/tracker-3.3.3.tar.xz
 Summary  : No detailed summary available
@@ -26,10 +26,9 @@ BuildRequires : gstreamer-dev
 BuildRequires : json-glib-dev
 BuildRequires : libexif-dev
 BuildRequires : libjpeg-turbo-dev
-BuildRequires : libsoup-dev
 BuildRequires : libunistring-dev
 BuildRequires : pkgconfig(bash-completion)
-BuildRequires : pkgconfig(libsoup-2.4)
+BuildRequires : pkgconfig(libsoup-3.0)
 BuildRequires : pkgconfig(uuid)
 BuildRequires : pkgconfig(zlib)
 BuildRequires : pygobject
@@ -125,7 +124,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1660014631
+export SOURCE_DATE_EPOCH=1661794613
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -135,7 +134,8 @@ export FCFLAGS="$FFLAGS -O3 -ffat-lto-objects -flto=auto "
 export FFLAGS="$FFLAGS -O3 -ffat-lto-objects -flto=auto "
 export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=auto "
 CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Dman=false \
--Ddocs=false  builddir
+-Ddocs=false \
+-Dsoup=soup3  builddir
 ninja -v -C builddir
 
 %check
@@ -242,7 +242,6 @@ DESTDIR=%{buildroot} ninja -C builddir install
 %defattr(-,root,root,-)
 /usr/lib64/libtracker-sparql-3.0.so.0
 /usr/lib64/libtracker-sparql-3.0.so.0.303.0
-/usr/lib64/tracker-3.0/libtracker-remote-soup2.so
 /usr/lib64/tracker-3.0/libtracker-remote-soup3.so
 
 %files libexec

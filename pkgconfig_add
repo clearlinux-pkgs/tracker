@@ -2,3 +2,4 @@
 # not get picked up automatically. One name per line, no whitespace.
 zlib
 uuid
+libsoup-3.0
