@@ -1,5 +1,7 @@
 libtracker-sparql-3.0.so.0:tracker_batch_add_resource
 libtracker-sparql-3.0.so.0:tracker_batch_add_sparql
+libtracker-sparql-3.0.so.0:tracker_batch_add_statement
+libtracker-sparql-3.0.so.0:tracker_batch_add_statementv
 libtracker-sparql-3.0.so.0:tracker_batch_execute
 libtracker-sparql-3.0.so.0:tracker_batch_execute_async
 libtracker-sparql-3.0.so.0:tracker_batch_execute_finish
@@ -111,6 +113,7 @@ libtracker-sparql-3.0.so.0:tracker_sparql_connection_update_finish
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_update_resource
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_update_resource_async
 libtracker-sparql-3.0.so.0:tracker_sparql_connection_update_resource_finish
+libtracker-sparql-3.0.so.0:tracker_sparql_connection_update_statement
 libtracker-sparql-3.0.so.0:tracker_sparql_cursor_close
 libtracker-sparql-3.0.so.0:tracker_sparql_cursor_get_boolean
 libtracker-sparql-3.0.so.0:tracker_sparql_cursor_get_connection
@@ -127,6 +130,7 @@ libtracker-sparql-3.0.so.0:tracker_sparql_cursor_next
 libtracker-sparql-3.0.so.0:tracker_sparql_cursor_next_async
 libtracker-sparql-3.0.so.0:tracker_sparql_cursor_next_finish
 libtracker-sparql-3.0.so.0:tracker_sparql_cursor_rewind
+libtracker-sparql-3.0.so.0:tracker_sparql_error_get_type
 libtracker-sparql-3.0.so.0:tracker_sparql_error_quark
 libtracker-sparql-3.0.so.0:tracker_sparql_escape_string
 libtracker-sparql-3.0.so.0:tracker_sparql_escape_uri
@@ -148,3 +152,6 @@ libtracker-sparql-3.0.so.0:tracker_sparql_statement_get_sparql
 libtracker-sparql-3.0.so.0:tracker_sparql_statement_get_type
 libtracker-sparql-3.0.so.0:tracker_sparql_statement_serialize_async
 libtracker-sparql-3.0.so.0:tracker_sparql_statement_serialize_finish
+libtracker-sparql-3.0.so.0:tracker_sparql_statement_update
+libtracker-sparql-3.0.so.0:tracker_sparql_statement_update_async
+libtracker-sparql-3.0.so.0:tracker_sparql_statement_update_finish

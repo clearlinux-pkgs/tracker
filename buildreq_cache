@@ -1,3 +1,4 @@
-3.4.2
+3.5.0
 bash-completion-dev
 pkgconfig(bash-completion)
+pkgconfig(gvdb)
