@@ -4,10 +4,10 @@
 # Using build pattern: meson
 #
 Name     : tracker
-Version  : 3.5.0
-Release  : 50
-URL      : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.0.tar.xz
-Source0  : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.0.tar.xz
+Version  : 3.5.1
+Release  : 51
+URL      : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.1.tar.xz
+Source0  : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.1.tar.xz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : GPL-2.0 LGPL-2.1
@@ -114,21 +114,22 @@ locales components for the tracker package.
 %package services
 Summary: services components for the tracker package.
 Group: Systemd services
+Requires: systemd
 
 %description services
 services components for the tracker package.
 
 
 %prep
-%setup -q -n tracker-3.5.0
-cd %{_builddir}/tracker-3.5.0
+%setup -q -n tracker-3.5.1
+cd %{_builddir}/tracker-3.5.1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1680043067
+export SOURCE_DATE_EPOCH=1682453860
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -247,7 +248,7 @@ DESTDIR=%{buildroot} ninja -C builddir install
 %files lib
 %defattr(-,root,root,-)
 /usr/lib64/libtracker-sparql-3.0.so.0
-/usr/lib64/libtracker-sparql-3.0.so.0.500.0
+/usr/lib64/libtracker-sparql-3.0.so.0.501.0
 /usr/lib64/tracker-3.0/libtracker-http-soup3.so
 /usr/lib64/tracker-3.0/libtracker-parser-libicu.so
 
