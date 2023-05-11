@@ -5,7 +5,7 @@
 #
 Name     : tracker
 Version  : 3.5.1
-Release  : 51
+Release  : 52
 URL      : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.1.tar.xz
 Source0  : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.1.tar.xz
 Summary  : No detailed summary available
