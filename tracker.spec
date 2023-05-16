@@ -4,10 +4,10 @@
 # Using build pattern: meson
 #
 Name     : tracker
-Version  : 3.5.1
-Release  : 52
-URL      : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.1.tar.xz
-Source0  : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.1.tar.xz
+Version  : 3.5.2
+Release  : 53
+URL      : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.2.tar.xz
+Source0  : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.2.tar.xz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : GPL-2.0 LGPL-2.1
@@ -121,27 +121,34 @@ services components for the tracker package.
 
 
 %prep
-%setup -q -n tracker-3.5.1
-cd %{_builddir}/tracker-3.5.1
+%setup -q -n tracker-3.5.2
+cd %{_builddir}/tracker-3.5.2
+pushd ..
+cp -a tracker-3.5.2 buildavx2
+popd
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1682453860
+export SOURCE_DATE_EPOCH=1684256915
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz "
-export FCFLAGS="$FFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz "
-export FFLAGS="$FFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz "
-export CXXFLAGS="$CXXFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz "
+export CFLAGS="$CFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
+export FCFLAGS="$FFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
+export FFLAGS="$FFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
+export CXXFLAGS="$CXXFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
 CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Dman=false \
 -Ddocs=false \
 -Dsoup=soup3  builddir
 ninja -v -C builddir
+CFLAGS="$CFLAGS -m64 -march=x86-64-v3 -Wl,-z,x86-64-v3 -O3" CXXFLAGS="$CXXFLAGS -m64 -march=x86-64-v3 -Wl,-z,x86-64-v3 " LDFLAGS="$LDFLAGS -m64 -march=x86-64-v3" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Dman=false \
+-Ddocs=false \
+-Dsoup=soup3  builddiravx2
+ninja -v -C builddiravx2
 
 %check
 export LANG=C.UTF-8
@@ -157,11 +164,13 @@ cp %{_builddir}/tracker-%{version}/COPYING.LGPL %{buildroot}/usr/share/package-l
 cp %{_builddir}/tracker-%{version}/src/libtracker-common/COPYING.LIB %{buildroot}/usr/share/package-licenses/tracker/9a1929f4700d2407c70b507b3b2aaf6226a9543c || :
 cp %{_builddir}/tracker-%{version}/src/libtracker-sparql/core/COPYING.LIB %{buildroot}/usr/share/package-licenses/tracker/9a1929f4700d2407c70b507b3b2aaf6226a9543c || :
 cp %{_builddir}/tracker-%{version}/subprojects/gvdb/COPYING %{buildroot}/usr/share/package-licenses/tracker/e2f8b4d1f76ec319b3e525132de7fa2460cac845 || :
+DESTDIR=%{buildroot}-v3 ninja -C builddiravx2 install
 DESTDIR=%{buildroot} ninja -C builddir install
 %find_lang tracker3
 ## install_append content
 #mv %{buildroot}/etc/xdg %{buildroot}/usr/share/
 ## install_append end
+/usr/bin/elf-move.py avx2 %{buildroot}-v3 %{buildroot} %{buildroot}/usr/share/clear/filemap/filemap-%{name}
 
 %files
 %defattr(-,root,root,-)
@@ -178,6 +187,7 @@ DESTDIR=%{buildroot} ninja -C builddir install
 
 %files bin
 %defattr(-,root,root,-)
+/V3/usr/bin/tracker3
 /usr/bin/tracker3
 
 %files data
@@ -223,6 +233,7 @@ DESTDIR=%{buildroot} ninja -C builddir install
 
 %files dev
 %defattr(-,root,root,-)
+/V3/usr/lib64/libtracker-sparql-3.0.so
 /usr/include/tracker-3.0/libtracker-sparql/tracker-batch.h
 /usr/include/tracker-3.0/libtracker-sparql/tracker-connection.h
 /usr/include/tracker-3.0/libtracker-sparql/tracker-cursor.h
@@ -247,13 +258,18 @@ DESTDIR=%{buildroot} ninja -C builddir install
 
 %files lib
 %defattr(-,root,root,-)
+/V3/usr/lib64/libtracker-sparql-3.0.so.0
+/V3/usr/lib64/libtracker-sparql-3.0.so.0.502.0
+/V3/usr/lib64/tracker-3.0/libtracker-http-soup3.so
+/V3/usr/lib64/tracker-3.0/libtracker-parser-libicu.so
 /usr/lib64/libtracker-sparql-3.0.so.0
-/usr/lib64/libtracker-sparql-3.0.so.0.501.0
+/usr/lib64/libtracker-sparql-3.0.so.0.502.0
 /usr/lib64/tracker-3.0/libtracker-http-soup3.so
 /usr/lib64/tracker-3.0/libtracker-parser-libicu.so
 
 %files libexec
 %defattr(-,root,root,-)
+/V3/usr/libexec/tracker-xdg-portal-3
 /usr/libexec/tracker-xdg-portal-3
 /usr/libexec/tracker3/endpoint
 /usr/libexec/tracker3/export
