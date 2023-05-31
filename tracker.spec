@@ -5,7 +5,7 @@
 #
 Name     : tracker
 Version  : 3.5.2
-Release  : 53
+Release  : 54
 URL      : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.2.tar.xz
 Source0  : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.2.tar.xz
 Summary  : No detailed summary available
@@ -132,7 +132,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1684256915
+export SOURCE_DATE_EPOCH=1685492673
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -233,7 +233,6 @@ DESTDIR=%{buildroot} ninja -C builddir install
 
 %files dev
 %defattr(-,root,root,-)
-/V3/usr/lib64/libtracker-sparql-3.0.so
 /usr/include/tracker-3.0/libtracker-sparql/tracker-batch.h
 /usr/include/tracker-3.0/libtracker-sparql/tracker-connection.h
 /usr/include/tracker-3.0/libtracker-sparql/tracker-cursor.h
@@ -258,7 +257,6 @@ DESTDIR=%{buildroot} ninja -C builddir install
 
 %files lib
 %defattr(-,root,root,-)
-/V3/usr/lib64/libtracker-sparql-3.0.so.0
 /V3/usr/lib64/libtracker-sparql-3.0.so.0.502.0
 /V3/usr/lib64/tracker-3.0/libtracker-http-soup3.so
 /V3/usr/lib64/tracker-3.0/libtracker-parser-libicu.so
