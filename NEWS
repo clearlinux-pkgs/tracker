@@ -1,9 +1,42 @@
-NEW in 3.5.3 - 2023-05-31
+NEW in 3.6.0 - 2023-09-16
 =========================
+Translations: eo
+
+  Highlighted changes since 3.5.0:
+  - Use BM25 as ranking algorithm
+  - Better and more cohesive documentation
+  - Add tracker_batch_add_rdf() API call to insert RDF data
+    as part of an update batch.
+
+NEW in 3.6.rc - 2023-09-05
+==========================
+  * Documentation updates
+
+Translations: fa, tr
+
+NEW in 3.6.beta - 2023-08-11
+============================
+  * Use BM25 as FTS ranking algorithm
+  * Add tracker_batch_add_rdf() call to add RDF as
+    a batch operation.
+  * Fix warnings with newer glib
+  * Adapt tests to SQLite >= 3.42
+  * Build improvements
+
+Translations: ro
+
+NEW in 3.6.alpha - 2023-07-04
+=============================
+  * Improved threading guarantees of TrackerNotifier signal
+    callbacks.
+  * Add tracker-await-file tool to trackertestutils
+  * A number of build system fixes
   * Build fixes around strftime() bug workarounds
     on some architectures/platforms.
   * Improved compatibility of JSON cursor readers
   * Leaks plugged
+
+Translations: en_GB, it, pt_BR, sk
 
 NEW in 3.5.2 - 2023-05-12
 =========================

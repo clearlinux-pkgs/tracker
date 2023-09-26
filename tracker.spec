@@ -4,10 +4,10 @@
 # Using build pattern: meson
 #
 Name     : tracker
-Version  : 3.5.3
-Release  : 56
-URL      : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.3.tar.xz
-Source0  : https://download.gnome.org/sources/tracker/3.5/tracker-3.5.3.tar.xz
+Version  : 3.6.0
+Release  : 57
+URL      : https://download.gnome.org/sources/tracker/3.6/tracker-3.6.0.tar.xz
+Source0  : https://download.gnome.org/sources/tracker/3.6/tracker-3.6.0.tar.xz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : GPL-2.0 LGPL-2.1
@@ -121,10 +121,10 @@ services components for the tracker package.
 
 
 %prep
-%setup -q -n tracker-3.5.3
-cd %{_builddir}/tracker-3.5.3
+%setup -q -n tracker-3.6.0
+cd %{_builddir}/tracker-3.6.0
 pushd ..
-cp -a tracker-3.5.3 buildavx2
+cp -a tracker-3.6.0 buildavx2
 popd
 
 %build
@@ -132,7 +132,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1685658586
+export SOURCE_DATE_EPOCH=1695687889
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -176,6 +176,8 @@ DESTDIR=%{buildroot} ninja -C builddir install
 %defattr(-,root,root,-)
 /usr/lib64/tracker-3.0/trackertestutils/__init__.py
 /usr/lib64/tracker-3.0/trackertestutils/__main__.py
+/usr/lib64/tracker-3.0/trackertestutils/await_file/__init__.py
+/usr/lib64/tracker-3.0/trackertestutils/await_file/__main__.py
 /usr/lib64/tracker-3.0/trackertestutils/dbusdaemon.py
 /usr/lib64/tracker-3.0/trackertestutils/dconf.py
 /usr/lib64/tracker-3.0/trackertestutils/helpers.py
@@ -183,6 +185,7 @@ DESTDIR=%{buildroot} ninja -C builddir install
 /usr/lib64/tracker-3.0/trackertestutils/psutil_mini.py
 /usr/lib64/tracker-3.0/trackertestutils/sandbox.py
 /usr/lib64/tracker-3.0/trackertestutils/storehelper.py
+/usr/lib64/tracker-3.0/trackertestutils/tracker-await-file
 /usr/lib64/tracker-3.0/trackertestutils/tracker-sandbox
 
 %files bin
@@ -214,20 +217,6 @@ DESTDIR=%{buildroot} ninja -C builddir install
 /usr/share/tracker3/ontologies/nepomuk/92-slo.ontology
 /usr/share/tracker3/ontologies/nepomuk/93-libosinfo.description
 /usr/share/tracker3/ontologies/nepomuk/93-libosinfo.ontology
-/usr/share/tracker3/stop-words/stopwords.cs
-/usr/share/tracker3/stop-words/stopwords.da
-/usr/share/tracker3/stop-words/stopwords.de
-/usr/share/tracker3/stop-words/stopwords.en
-/usr/share/tracker3/stop-words/stopwords.es
-/usr/share/tracker3/stop-words/stopwords.fi
-/usr/share/tracker3/stop-words/stopwords.fr
-/usr/share/tracker3/stop-words/stopwords.hu
-/usr/share/tracker3/stop-words/stopwords.it
-/usr/share/tracker3/stop-words/stopwords.nb
-/usr/share/tracker3/stop-words/stopwords.nl
-/usr/share/tracker3/stop-words/stopwords.pt
-/usr/share/tracker3/stop-words/stopwords.ru
-/usr/share/tracker3/stop-words/stopwords.sv
 /usr/share/vala/vapi/tracker-sparql-3.0.deps
 /usr/share/vala/vapi/tracker-sparql-3.0.vapi
 
@@ -257,11 +246,11 @@ DESTDIR=%{buildroot} ninja -C builddir install
 
 %files lib
 %defattr(-,root,root,-)
-/V3/usr/lib64/libtracker-sparql-3.0.so.0.503.0
+/V3/usr/lib64/libtracker-sparql-3.0.so.0.600.0
 /V3/usr/lib64/tracker-3.0/libtracker-http-soup3.so
 /V3/usr/lib64/tracker-3.0/libtracker-parser-libicu.so
 /usr/lib64/libtracker-sparql-3.0.so.0
-/usr/lib64/libtracker-sparql-3.0.so.0.503.0
+/usr/lib64/libtracker-sparql-3.0.so.0.600.0
 /usr/lib64/tracker-3.0/libtracker-http-soup3.so
 /usr/lib64/tracker-3.0/libtracker-parser-libicu.so
 
