@@ -12,10 +12,16 @@ libtracker-sparql-3.0.so.0:tracker_check_version
 libtracker-sparql-3.0.so.0:tracker_deserialize_flags_get_type
 libtracker-sparql-3.0.so.0:tracker_endpoint_dbus_get_type
 libtracker-sparql-3.0.so.0:tracker_endpoint_dbus_new
+libtracker-sparql-3.0.so.0:tracker_endpoint_get_allowed_graphs
+libtracker-sparql-3.0.so.0:tracker_endpoint_get_allowed_services
+libtracker-sparql-3.0.so.0:tracker_endpoint_get_readonly
 libtracker-sparql-3.0.so.0:tracker_endpoint_get_sparql_connection
 libtracker-sparql-3.0.so.0:tracker_endpoint_get_type
 libtracker-sparql-3.0.so.0:tracker_endpoint_http_get_type
 libtracker-sparql-3.0.so.0:tracker_endpoint_http_new
+libtracker-sparql-3.0.so.0:tracker_endpoint_set_allowed_graphs
+libtracker-sparql-3.0.so.0:tracker_endpoint_set_allowed_services
+libtracker-sparql-3.0.so.0:tracker_endpoint_set_readonly
 libtracker-sparql-3.0.so.0:tracker_namespace_manager_add_prefix
 libtracker-sparql-3.0.so.0:tracker_namespace_manager_compress_uri
 libtracker-sparql-3.0.so.0:tracker_namespace_manager_expand_uri
@@ -121,6 +127,7 @@ libtracker-sparql-3.0.so.0:tracker_sparql_cursor_get_connection
 libtracker-sparql-3.0.so.0:tracker_sparql_cursor_get_datetime
 libtracker-sparql-3.0.so.0:tracker_sparql_cursor_get_double
 libtracker-sparql-3.0.so.0:tracker_sparql_cursor_get_integer
+libtracker-sparql-3.0.so.0:tracker_sparql_cursor_get_langstring
 libtracker-sparql-3.0.so.0:tracker_sparql_cursor_get_n_columns
 libtracker-sparql-3.0.so.0:tracker_sparql_cursor_get_string
 libtracker-sparql-3.0.so.0:tracker_sparql_cursor_get_type
@@ -143,6 +150,7 @@ libtracker-sparql-3.0.so.0:tracker_sparql_statement_bind_boolean
 libtracker-sparql-3.0.so.0:tracker_sparql_statement_bind_datetime
 libtracker-sparql-3.0.so.0:tracker_sparql_statement_bind_double
 libtracker-sparql-3.0.so.0:tracker_sparql_statement_bind_int
+libtracker-sparql-3.0.so.0:tracker_sparql_statement_bind_langstring
 libtracker-sparql-3.0.so.0:tracker_sparql_statement_bind_string
 libtracker-sparql-3.0.so.0:tracker_sparql_statement_clear_bindings
 libtracker-sparql-3.0.so.0:tracker_sparql_statement_execute
