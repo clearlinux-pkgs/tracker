@@ -1,4 +1,4 @@
-3.7.1
+3.7.2
 bash-completion-dev
 pkgconfig(avahi-client)
 pkgconfig(avahi-glib)
