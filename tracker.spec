@@ -7,7 +7,7 @@
 #
 Name     : tracker
 Version  : 3.7.3
-Release  : 61
+Release  : 62
 URL      : https://download.gnome.org/sources/tracker/3.7/tracker-3.7.3.tar.xz
 Source0  : https://download.gnome.org/sources/tracker/3.7/tracker-3.7.3.tar.xz
 Summary  : No detailed summary available
