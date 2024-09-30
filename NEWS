@@ -1,3 +1,81 @@
+NEW in 3.8.0 - 2024-09-16
+=========================
+
+Translation updates:
+  * Basque
+  * Belarusian
+  * Brazilian Portuguese
+  * British English
+  * Bulgarian
+  * Chinese (China)
+  * Czech
+  * Danish
+  * Galician
+  * Georgian
+  * German
+  * Hebrew
+  * Hungarian
+  * Indonesian
+  * Lithuanian
+  * Persian
+  * Polish
+  * Portuguese
+  * Russian
+  * Slovak
+  * Slovenian
+  * Spanish
+  * Swedish
+  * Turkish
+  * Ukrainian
+
+NEW in 3.8.rc - 2024-09-01
+==========================
+  * UI/UX improvements to the web IDE
+  * Turned the web IDE into a "tinysparql webide" CLI command
+  * Separate HTTP code to an internal static library
+  * Handle chunked encoding in HTTP responses
+  * Added a new "tinysparql introspect" subcommand to introspect
+    ontology and data structure details from SPARQL endpoints
+  * Renamed the "tinysparql sparql" subcommand into "tinysparql query",
+    and substantially clean up its options (many of them moved to the
+    "introspect" subcommand)
+  * Provide RDF namespaces at a minimum on empty JSON-LD data
+  * Memory leak fixes
+  * Fixes to issues reported by Coverity
+  * Clean up traces of GVDB
+  * Improved test coverage, above 90% now
+  * Handle TINYSPARQL_DEBUG environment variable for debugging
+
+Translations: be, ca, cs, el, eu, fa, he, hu, ka, ko, lt, pt,
+  pt_BR, ro, ru, th, tr, uk, zh_CN
+
+NEW in 3.8.beta - 2024-08-09
+============================
+  * New frontend code for web IDE, featuring error highlighting
+    and other improvements.
+  * Allow reading ontology files in all supported formats
+    besides Turtle (Trig, JSON-LD)
+  * Made the default graph have a nrl:DefaultGraph name
+  * Command line was reunited into a single executable
+  * Code consistence improvements and other cleanups
+  * Added debugging for HTTP responses
+  * Build warning fixes
+  * Testing improvements
+
+Translations: he, hi, ru, sl, zh_TW
+
+NEW in 3.8.alpha - 2024-07-04
+=============================
+  * Rename project to TinySPARQL
+  * Incipient implementation of a web-based IDE
+  * Drop libsoup2 support
+  * Improved database creation and schema updates
+  * Fix possible missed updates on INSERT OR REPLACE syntax
+  * Fix build with `-Dman=false`
+  * Use "#pragma once" in headers
+  * Check introspection for python examples
+  * Use meson summary()
+
 NEW in 3.7.3 - 2024-05-02
 =========================
   * Bump database version to fix SQLite 3.45.3 issues in existing

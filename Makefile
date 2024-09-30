@@ -1,5 +1,5 @@
 PKG_NAME := tracker
-URL = https://download.gnome.org/sources/tracker/3.7/tracker-3.7.3.tar.xz
+URL = https://gitlab.gnome.org/GNOME/tinysparql/-/archive/3.8.0/tinysparql-3.8.0.tar.bz2
 ARCHIVES = 
 
 include ../common/Makefile.common
